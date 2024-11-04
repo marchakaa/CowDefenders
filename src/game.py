@@ -2,6 +2,7 @@ import pygame
 from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, TILE_SIZE
 from src.map import Tile, map1
 from src.enemy import enemytest
+from src.ui import hud
 
 class Game:
     def __init__(self):
@@ -32,17 +33,22 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                hud.handle_click_events(event.pos)
             if event.type == pygame.QUIT:
                 self.running = False
         
     def update(self):
         enemytest.update()
+        hud.update()
 
     def render(self):
         self.screen.fill((0, 100, 0))
         map1.render_map(self.screen)
+        hud.render(self.screen)
         mouse_pos = pygame.mouse.get_pos()
         if(mouse_pos[0] <TILE_SIZE*20 and mouse_pos[1] < TILE_SIZE*15):
             map1.tiles[mouse_pos[0]//32][mouse_pos[1]//32].update(self.screen)
         enemytest.render(self.screen)
         pygame.display.flip()
+        
