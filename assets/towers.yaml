@@ -1,0 +1,6 @@
+Cow:
+  damage: 10
+  attack_speed: 1
+  url: "assets/maps/Cow.png"
+  card_url: "assets/cards/Cow.png"
+  rarity: "COMMON"

@@ -1,15 +1,16 @@
 from pygame import sprite
 import pygame
-from src.map import mapPoints
+from src.map import map1, MAP_START
+from src.settings import TILE_SIZE
 
 class Enemy(sprite.Sprite):
-    def __init__(self, name, health, move_speed, image_url=""):
+    def __init__(self, name:str, health:int, move_speed:float, image_url:str=""):
         super().__init__()
         self.name = name
         self.hp = health
         self.move_speed = move_speed
-        self.size = 32
-        self.center_pos = [0, 13 * 32]
+        self.size = TILE_SIZE
+        self.center_pos = [MAP_START[0], MAP_START[1] + 8 * TILE_SIZE]
         self.checkpoint = 0
 
         if image_url:
@@ -19,8 +20,8 @@ class Enemy(sprite.Sprite):
             self.image = None
 
     def update(self):
-        if self.checkpoint < len(mapPoints) - 1:
-            next_target = mapPoints[self.checkpoint + 1]
+        if self.checkpoint < len(map1.map_points) - 1:
+            next_target = map1.map_points[self.checkpoint + 1]
 
             if self.center_pos[0] < next_target[0]:
                 self.center_pos[0] += self.move_speed
@@ -47,4 +48,6 @@ class Enemy(sprite.Sprite):
     def __repr__(self):
         return super().__repr__()
 # Example usage
-enemytest = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
+enemy1 = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
+enemies_on_map = sprite.Group()
+enemies_on_map.add(enemy1)

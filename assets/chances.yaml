@@ -1,0 +1,121 @@
+waves:
+  - wave: 1
+    cost_1: 100
+    cost_2: 0
+    cost_3: 0
+    cost_4: 0
+    cost_5: 0
+  - wave: 2
+    cost_1: 100
+    cost_2: 0
+    cost_3: 0
+    cost_4: 0
+    cost_5: 0
+  - wave: 3
+    cost_1: 90
+    cost_2: 10
+    cost_3: 0
+    cost_4: 0
+    cost_5: 0
+  - wave: 4
+    cost_1: 87
+    cost_2: 13
+    cost_3: 0
+    cost_4: 0
+    cost_5: 0
+  - wave: 5
+    cost_1: 73
+    cost_2: 24
+    cost_3: 3
+    cost_4: 0
+    cost_5: 0
+  - wave: 6
+    cost_1: 67
+    cost_2: 28
+    cost_3: 5
+    cost_4: 0
+    cost_5: 0
+  - wave: 7
+    cost_1: 60
+    cost_2: 32
+    cost_3: 8
+    cost_4: 0
+    cost_5: 0
+  - wave: 8
+    cost_1: 53
+    cost_2: 36
+    cost_3: 11
+    cost_4: 0
+    cost_5: 0
+  - wave: 9
+    cost_1: 43
+    cost_2: 41
+    cost_3: 14
+    cost_4: 2
+    cost_5: 0
+  - wave: 10
+    cost_1: 38
+    cost_2: 38
+    cost_3: 17
+    cost_4: 5
+    cost_5: 0
+  - wave: 11
+    cost_1: 38
+    cost_2: 35
+    cost_3: 20
+    cost_4: 7
+    cost_5: 0
+  - wave: 12
+    cost_1: 35
+    cost_2: 32
+    cost_3: 24
+    cost_4: 9
+    cost_5: 0
+  - wave: 13
+    cost_1: 32
+    cost_2: 29
+    cost_3: 29
+    cost_4: 10
+    cost_5: 0
+  - wave: 14
+    cost_1: 27
+    cost_2: 26
+    cost_3: 34
+    cost_4: 13
+    cost_5: 0
+  - wave: 15
+    cost_1: 22
+    cost_2: 24
+    cost_3: 37
+    cost_4: 16
+    cost_5: 1
+  - wave: 16
+    cost_1: 21
+    cost_2: 23
+    cost_3: 34
+    cost_4: 19
+    cost_5: 3
+  - wave: 17
+    cost_1: 20
+    cost_2: 21
+    cost_3: 30
+    cost_4: 22
+    cost_5: 7
+  - wave: 18
+    cost_1: 18
+    cost_2: 20
+    cost_3: 27
+    cost_4: 25
+    cost_5: 10
+  - wave: 19
+    cost_1: 16
+    cost_2: 18
+    cost_3: 23
+    cost_4: 29
+    cost_5: 14
+  - wave: 20
+    cost_1: 14
+    cost_2: 15
+    cost_3: 18
+    cost_4: 33
+    cost_5: 20
