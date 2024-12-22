@@ -3,6 +3,7 @@ from src.settings import TILE_SIZE
 from src.enemy import enemies_on_map
 from math import sqrt, degrees, atan2
 from src.map import Tile, map1
+import os
 
 class Tower(sprite.Sprite):
     def __init__(self, name:str, dmg:float, image_url:str=""):
@@ -38,7 +39,10 @@ class Tower(sprite.Sprite):
 
     def set_position(self, tile:Tile):
         self.center_pos = tuple(coord + TILE_SIZE / 2 for coord in tile.pos_top_left)
-
+    def set_position_bench(self, index):
+        row = index // 2
+        col = index % 2
+        self.center_pos = (38 + (TILE_SIZE/2) + 84*col, 198 + (TILE_SIZE/2) + 84*row)
     def rotate_to_target(self):
         if self.target_enemy:
             # Calculate angle to the target enemy
@@ -67,7 +71,13 @@ class Tower(sprite.Sprite):
         return sqrt(dx**2 + dy**2)
 
 towers_on_map = sprite.Group()
-tower1 = Tower("Cow", 10, 'assets\maps\Cow.png')
-tower2 = Tower("Cow2", 10, 'assets\maps\Cow.png')
+tower1 = Tower("Cow", 10, 'assets\maps\cow.png')
+tower2 = Tower("Cow2", 10, 'assets\maps\cow.png')
 tower2.set_position(map1.tiles[5][6])
 towers_on_map.add(tower1, tower2)
+
+# for j in range(0, 10):
+#     for i in range(0, 20):
+#         tower = Tower("Cow", 10, 'assets\maps\Cow.png')
+#         tower.set_position(map1.tiles[i][j])
+#         towers_on_map.add(tower)

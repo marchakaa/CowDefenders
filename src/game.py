@@ -4,6 +4,7 @@ from src.map import Tile, map1
 from src.ui import hud
 from src.enemy import enemies_on_map
 from src.tower import towers_on_map
+from src.player import player
 
 class Game:
     def __init__(self):
@@ -12,10 +13,11 @@ class Game:
         # self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.screen_width = display_info.current_w
         self.screen_height = display_info.current_h
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height), pygame.FULLSCREEN  | pygame.HWSURFACE)
 
         pygame.display.set_caption("Cow Defenders")
         self.running = True
+
 
         self.clock = pygame.time.Clock()
 
@@ -36,6 +38,7 @@ class Game:
                     self.running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 hud.handle_click_events(event.pos)
+                player.handle_click_event(event.pos)
             if event.type == pygame.QUIT:
                 self.running = False
         
@@ -56,6 +59,8 @@ class Game:
         if 0 <= x_index < len(map1.tiles) and 0 <= y_index < len(map1.tiles[0]):
             map1.tiles[x_index][y_index].update(self.screen)
 
+        #Render player
+        player.render(self.screen)
         #Render enemies
         for enemy in enemies_on_map:
             enemy.render(self.screen)
@@ -63,5 +68,16 @@ class Game:
         #Render towers
         for tower in towers_on_map:
             tower.render(self.screen)
+
+
+        
+        fps = int(self.clock.get_fps())
+            
+            # Create text to display FPS
+        font = pygame.font.Font(None, 36)  # None uses default font, 36 is size
+        fps_text = font.render(f'FPS: {fps}', True, (0,0,0))  # White color
+            
+            # Draw the FPS in the corner of the screen
+        self.screen.blit(fps_text, (10, 10))
         pygame.display.flip()
         

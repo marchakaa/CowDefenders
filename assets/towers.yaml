@@ -1,6 +1,22 @@
+Empty:
+  damage: 0
+  attack_speed: 0
+  rarity: "EMPTY"
+  traits:
+    - "Empty"
 Cow:
   damage: 10
   attack_speed: 1
-  url: "assets/maps/Cow.png"
-  card_url: "assets/cards/Cow.png"
   rarity: "COMMON"
+  traits:
+    - "Grassland"
+    - "Milk Producer"
+
+Fire Cow:
+  damage: 15
+  attack_speed: 0.74
+  rarity: "LEGENDARY"
+  traits:
+    - "Fire Resistant"
+    - "Flaming Horns"
+    - "Infernal Charge"
