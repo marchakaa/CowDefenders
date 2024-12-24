@@ -36,6 +36,9 @@ class Tower(sprite.Sprite):
         return super().__str__()
     def __repr__(self):
         return super().__repr__()
+    
+    def set_pos(self, pos):
+        self.center_pos = pos
 
     def set_position(self, tile:Tile):
         self.center_pos = tuple(coord + TILE_SIZE / 2 for coord in tile.pos_top_left)
@@ -70,11 +73,19 @@ class Tower(sprite.Sprite):
         dy = self.center_pos[1] - enemy.center_pos[1]
         return sqrt(dx**2 + dy**2)
 
-towers_on_map = sprite.Group()
-tower1 = Tower("Cow", 10, 'assets\maps\cow.png')
-tower2 = Tower("Cow2", 10, 'assets\maps\cow.png')
-tower2.set_position(map1.tiles[5][6])
-towers_on_map.add(tower1, tower2)
+    def handle_left_click(self, mouse_pos):
+        rect = self.image.get_rect(center=self.center_pos)
+        if rect.collidepoint(mouse_pos):
+            print(self.name)
+            return self
+
+
+    def handle_right_click(self, mouse_pos):
+        rect = self.image.get_rect(center=self.center_pos)
+        if rect.collidepoint(mouse_pos):
+            print(self.name)
+            return self
+
 
 # for j in range(0, 10):
 #     for i in range(0, 20):

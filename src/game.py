@@ -3,7 +3,6 @@ from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, TILE_SIZE
 from src.map import Tile, map1
 from src.ui import hud
 from src.enemy import enemies_on_map
-from src.tower import towers_on_map
 from src.player import player
 
 class Game:
@@ -37,16 +36,24 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    #Leftclick
+                    pass
+                if event.button == 3:
+                    #RightClick
+                    pass
                 hud.handle_click_events(event.pos)
-                player.handle_click_event(event.pos)
+                player.handle_click_event(event)
+            if event.type == pygame.MOUSEMOTION:
+                player.mouse_move_event(event.pos)
             if event.type == pygame.QUIT:
                 self.running = False
         
     def update(self):
         #Update enemies
         enemies_on_map.update()
-        #Update towers
-        towers_on_map.update()
+        #Update player
+        player.update()
         hud.update()
 
     def render(self):
@@ -64,11 +71,6 @@ class Game:
         #Render enemies
         for enemy in enemies_on_map:
             enemy.render(self.screen)
-
-        #Render towers
-        for tower in towers_on_map:
-            tower.render(self.screen)
-
 
         
         fps = int(self.clock.get_fps())

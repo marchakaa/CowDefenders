@@ -1,0 +1,39 @@
+Costs:
+  1_Cost: 10
+  2_Cost: 9
+  3_Cost: 8
+  4_Cost: 7
+  5_Cost: 6
+  Total: 40
+
+Traits:
+  Gunners:
+    Effect:
+      pass
+    Cows:
+      - Moochinegunner (5)
+      - PumpGunner (3)
+      - Military (1)
+
+  Elementals:
+    Effect:
+      pass
+    Cows:
+      - Ice Cow (5)
+      - Fire Cow (4)
+      - Water Cow (1)
+      - Mountain Cow (1)
+
+  Primary:
+    Effect:
+      pass
+    Cows:
+      - Spearcow (5)
+      - Torch (3)
+      - Cowtapult (2)
+      - Archer (1)
+
+Classes:
+  Poisoner:
+    - Water cow (1)
+    - Spearcow (5)

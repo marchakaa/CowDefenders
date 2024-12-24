@@ -28,7 +28,10 @@ class Map:
         screen.blit(self.map_image, [MAP_START[0], MAP_START[1]])
     def draw(screen):
         pass
-    
+    def get_tile_by_pos(self, pos:tuple) -> Tile:
+        if pos[0] >= 225 or pos[0] <= 1697 or pos[1] >= 121 or pos[1] <= 761:
+            return self.tiles[(pos[0] - 225) // 64][(pos[1] - 121) // 64]
+            
     def __str__(self):
         return super().__str__()
     def __repr__(self):
