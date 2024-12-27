@@ -2,6 +2,7 @@ from random import random
 from src.card import cards, Card, Rarity
 import yaml
 import random
+from pygame import Rect, draw
 
 
 class Shop:
@@ -16,6 +17,8 @@ class Shop:
             '5_cost': 0,
         }
         self.refresh_shop()
+        self.reroll_button_rect = Rect(260,900, 100, 50)
+        
 
     def update_shop_percentages(self, current_wave):
         with open('assets/chances.yaml', "r") as file:
@@ -56,6 +59,7 @@ class Shop:
     def render(self, screen):
         for i, card in enumerate(self.content):
             card.render(screen, shop_positions[i])
+        draw.rect(screen, (0, 0, 200), self.reroll_button_rect)
     def set_pool(self, pool):
         pass
 

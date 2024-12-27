@@ -1,4 +1,4 @@
-from pygame import sprite, image, transform, draw
+from pygame import sprite, image, transform, draw, font
 from src.settings import TILE_SIZE
 from src.enemy import enemies_on_map
 from math import sqrt, degrees, atan2
@@ -13,13 +13,14 @@ class Tower(sprite.Sprite):
         self.size = TILE_SIZE
         self.center_pos = [257,153]
         self.target_enemy = None
-        
+        self.level = 1        
         if image_url:
             self.original_image = image.load(image_url)  # Keep the original image unrotated
             self.original_image = transform.scale(self.original_image, (self.size, self.size))
             self.image = self.original_image
         else:
             self.image = None
+        self.font = font.Font(None, 24)
 
     def update(self):
         self.find_closest_target()
@@ -31,7 +32,11 @@ class Tower(sprite.Sprite):
             screen.blit(self.image, rect)
         else:
             draw.rect(screen, (0,255,0), (self.center_pos[0] - self.size / 2, self.center_pos[1] - self.size / 2, self.size, self.size))
-        
+        level_text = self.font.render(f"Lvl {self.level}", True, (255, 255, 255))
+        text_rect = level_text.get_rect(center=(self.center_pos[0], self.center_pos[1] - self.size / 2 - 10))
+        screen.blit(level_text, text_rect)
+
+
     def __str__(self):
         return super().__str__()
     def __repr__(self):
@@ -76,15 +81,16 @@ class Tower(sprite.Sprite):
     def handle_left_click(self, mouse_pos):
         rect = self.image.get_rect(center=self.center_pos)
         if rect.collidepoint(mouse_pos):
-            print(self.name)
             return self
 
 
     def handle_right_click(self, mouse_pos):
         rect = self.image.get_rect(center=self.center_pos)
         if rect.collidepoint(mouse_pos):
-            print(self.name)
             return self
+        
+    def star_up(self):
+        self.level += 1
 
 
 # for j in range(0, 10):

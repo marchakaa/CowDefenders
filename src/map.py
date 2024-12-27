@@ -3,8 +3,7 @@ from src.settings import TILE_SIZE
 
 
 class Tile:
-    def __init__(self, startPos, empty=True, available=True):
-        self.empty = empty
+    def __init__(self, startPos, available=True):
         self.available = available
         self.size = 64
         self.pos_top_left = startPos
@@ -29,9 +28,38 @@ class Map:
     def draw(screen):
         pass
     def get_tile_by_pos(self, pos:tuple) -> Tile:
-        if pos[0] >= 225 or pos[0] <= 1697 or pos[1] >= 121 or pos[1] <= 761:
+        if pos[0] >= 225 and pos[0] <= 1697 and pos[1] >= 121 and pos[1] <= 761:
             return self.tiles[(pos[0] - 225) // 64][(pos[1] - 121) // 64]
-            
+    
+    def make_tile_unavailable(self, tile:Tile):
+        tile.available = False
+
+    def make_tiles_unavailable(self, mappoints):
+        curr_row, curr_col = mappoints[0][1], mappoints[0][0]
+
+        for i in range(1, len(mappoints)):
+            next_col = curr_col + mappoints[i][0]
+            next_row = curr_row + mappoints[i][1]
+
+            if curr_row == next_row:
+                step = 1 if curr_col < next_col else -1
+                for col in range(curr_col, next_col + step, step):
+                    if col > 22: break
+                    self.tiles[col][curr_row].available = False
+                    self.tiles[col][curr_row - 1].available = False
+
+            elif curr_col == next_col:
+                step = 1 if curr_row < next_row else -1
+                for row in range(curr_row, next_row + step, step):
+                    if row > 9: return
+                    if row == next_row: self.tiles[curr_col - 1][row - 1].available = False
+                    self.tiles[curr_col][row].available = False
+                    self.tiles[curr_col - 1][row].available = False
+
+            curr_col, curr_row = next_col, next_row
+
+
+
     def __str__(self):
         return super().__str__()
     def __repr__(self):
@@ -55,3 +83,4 @@ for i in range(23):
 map1 = Map(tiles, "assets\maps\map1.png")
 map1Points = ((0, 8), (4, 0), (0, -4), (3, 0), (0, -2), (3, 0), (0, 6), (4, 0), (0, -3), (6, 0), (0, -3), (3, 0))
 map1.create_mapPoints(map1Points)
+map1.make_tiles_unavailable(map1Points)
