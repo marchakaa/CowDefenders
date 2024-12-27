@@ -2,7 +2,7 @@ from src.tower import Tower
 from src.shop import Shop
 from src.tower import Tower
 from src.settings import BENCH_SIZE, FONT_URL
-from pygame import sprite, font
+from pygame import sprite, font, draw
 from src.map import map1
 class Player:
     def __init__(self):
@@ -10,9 +10,10 @@ class Player:
         self.field = sprite.Group()
         self.chances: list[int] = [0,0,0,0,0]
         self.gold: int = 100
-        self.hp: int = 100
+        self.health: int = 100
         self.shop: Shop = Shop()
         self.cow_on_hold = None
+        self.health_color =self.transition_color_health_bar()
 
     def add_to_bench(self, tower:Tower):
         for index, slot in enumerate(self.bench):
@@ -41,12 +42,13 @@ class Player:
     def remove_gold(self, amount:int):
         self.gold -= amount
         
-    def add_hp(self, amount:int):
-        self.hp += amount
-    def remove_hp(self, amount:int):
-        self.hp -= amount
-    def set_hp(self, amount:int):
-        self.hp = amount
+    def add_health(self, amount:int):
+        self.health += amount
+    def remove_health(self, amount:int):
+        self.health = 0 if self.health <= amount else self.health - amount
+        self.transition_color_health_bar()
+    def set_health(self, amount:int):
+        self.health = amount
 
     def update(self):
         self.field.update()
@@ -60,7 +62,17 @@ class Player:
             self.cow_on_hold.render(screen)
         #Render money
         self.render_gold(screen)
+        #Render health
+        self.render_health(screen)
             
+    def transition_color_health_bar(self) -> None:
+
+        start_r, start_g, start_b = 172, 50, 50
+        end_r, end_g, end_b = 72, 200, 117
+        self.health_color = (int(start_r + (end_r - start_r) * self.health / 100),
+                             int(start_g + (end_g - start_g) * self.health / 100),
+                             int(start_b + (end_b - start_b) * self.health / 100),
+                             )
 
     def buy_card_from_shop(self, card_index:int):
         card = self.shop.content[card_index]
@@ -156,10 +168,16 @@ class Player:
         print(f"No upgrades available for {tower.name}.")
         return False
 
+    def render_health(self, screen) -> None:
+        if not self.health_color:
+            self.transition_color_health_bar()
+        draw.polygon(screen, self.health_color, ((1619, 27), (1619 + 218*self.health/100, 27), (1647 + 218*self.health/100, 56), (1647, 56)))
+        screen.blit(PLAYER_TEXT.render(str(self.health), True, (255,255,255)), (1800, 26))
+        
     def render_gold(self, screen) -> None:
-        screen.blit(MONEY_TEXT.render(str(self.gold), True, (0,0,0)) , (1800, 30))
+        screen.blit(PLAYER_TEXT.render(str(self.gold), True, (255,255,255)) , (1800, 57))
 
         
 
 player = Player()
-MONEY_TEXT = font.Font(FONT_URL, 32)
+PLAYER_TEXT = font.Font(FONT_URL, 28)

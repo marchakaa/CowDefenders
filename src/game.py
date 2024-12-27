@@ -17,7 +17,6 @@ class Game:
         pygame.display.set_caption("Cow Defenders")
         self.running = True
 
-
         self.clock = pygame.time.Clock()
 
     def run(self):
@@ -70,6 +69,7 @@ class Game:
         player.render(self.screen)
         #Render enemies
         for enemy in enemies_on_map:
+            enemy.set_player(player)
             enemy.render(self.screen)
 
         

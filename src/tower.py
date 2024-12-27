@@ -25,6 +25,7 @@ class Tower(sprite.Sprite):
     def update(self):
         self.find_closest_target()
         self.rotate_to_target()
+        self.attack_enemy()
 
     def render(self, screen):
         if self.image:
@@ -92,6 +93,9 @@ class Tower(sprite.Sprite):
     def star_up(self):
         self.level += 1
 
+    def attack_enemy(self):
+        if self.target_enemy:
+            self.target_enemy.take_damage(0.1)
 
 # for j in range(0, 10):
 #     for i in range(0, 20):

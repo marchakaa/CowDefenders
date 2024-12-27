@@ -7,11 +7,14 @@ class Enemy(sprite.Sprite):
     def __init__(self, name:str, health:int, move_speed:float, image_url:str=""):
         super().__init__()
         self.name = name
-        self.hp = health
+        self.max_health = health
+        self.current_health = health
         self.move_speed = move_speed
+        self.damage = 10
         self.size = TILE_SIZE
         self.center_pos = [MAP_START[0], MAP_START[1] + 8 * TILE_SIZE]
         self.checkpoint = 0
+        self.player = None
 
         if image_url:
             self.image = pygame.image.load(image_url)
@@ -35,6 +38,9 @@ class Enemy(sprite.Sprite):
 
             if self.center_pos == list(next_target):
                 self.checkpoint += 1
+        else:
+            self.player.remove_health(self.damage)
+            self.on_death()
 
     def render(self, screen):
         if self.image:
@@ -43,11 +49,37 @@ class Enemy(sprite.Sprite):
         else:
             pygame.draw.rect(screen, (255, 0, 0), (self.center_pos[0] - self.size / 2, self.center_pos[1] - self.size / 2, self.size, self.size))
 
+        #Draw healthbar
+        health_bar_width = self.size
+        health_bar_height = 5
+        health_bar_x = self.center_pos[0] - self.size / 2
+        health_bar_y = self.center_pos[1] - self.size / 2 - health_bar_height - 2
+
+        current_health_width = int((self.current_health / self.max_health) * health_bar_width)
+        health_bar_background = pygame.Rect(health_bar_x, health_bar_y, health_bar_width, health_bar_height)
+        current_health_rect = pygame.Rect(health_bar_x, health_bar_y, current_health_width, health_bar_height)
+
+        pygame.draw.rect(screen, (128, 128, 128), health_bar_background)
+
+        pygame.draw.rect(screen, (0, 255, 0), current_health_rect)
+
+    def take_damage(self, amount):
+        if amount >= self.current_health:
+            self.on_death()
+        else:
+            self.current_health -= amount
+    def on_death(self):
+        enemies_on_map.remove(self)
+
+    def set_player(self, player):
+        self.player = player
     def __str__(self):
         return super().__str__()
     def __repr__(self):
         return super().__repr__()
 # Example usage
 enemy1 = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
+# enemy2 = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
+# enemy3 = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
 enemies_on_map = sprite.Group()
 enemies_on_map.add(enemy1)
