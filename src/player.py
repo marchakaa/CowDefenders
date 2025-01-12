@@ -13,6 +13,7 @@ class Player:
         self.health: int = 100
         self.shop: Shop = Shop()
         self.cow_on_hold = None
+        self.clicked_cow = None
         self.health_color =self.transition_color_health_bar()
 
     def add_to_bench(self, tower:Tower):
@@ -50,8 +51,8 @@ class Player:
     def set_health(self, amount:int):
         self.health = amount
 
-    def update(self):
-        self.field.update()
+    def update(self, delta_time):
+        self.field.update(delta_time)
     def render(self, screen):
         self.shop.render(screen)
         for cow in self.bench:
@@ -60,6 +61,8 @@ class Player:
             cow.render(screen)
         if self.cow_on_hold:
             self.cow_on_hold.render(screen)
+        if self.clicked_cow:
+            self.clicked_cow.render_range(screen)
         #Render money
         self.render_gold(screen)
         #Render health
@@ -117,6 +120,13 @@ class Player:
                         if clicked_cow:
                             self.cow_on_hold = clicked_cow
                             break
+            #Select cow to draw range
+            if self.clicked_cow == None:
+                for cow in self.field:
+                    if cow:
+                        self.clicked_cow = cow.handle_left_click(mouse_click_event.pos)
+                        if self.clicked_cow: break
+            else: self.clicked_cow = None
         
         if mouse_click_event.button == 3:
             pass    

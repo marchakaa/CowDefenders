@@ -21,13 +21,14 @@ class Game:
 
     def run(self):
         while self.running:
+            delta_time = self.clock.tick(FPS) / 1000
+
             self.handle_events()
 
-            self.update()
+            self.update(delta_time)
 
             self.render()
 
-            self.clock.tick(FPS)
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -48,12 +49,12 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
         
-    def update(self):
+    def update(self, delta_time):
         #Update enemies
-        enemies_on_map.update()
+        enemies_on_map.update(delta_time)
         #Update player
-        player.update()
-        hud.update()
+        player.update(delta_time)
+        hud.update(delta_time)
 
     def render(self):
         self.screen.fill((0, 100, 0))
@@ -76,10 +77,10 @@ class Game:
         fps = int(self.clock.get_fps())
             
             # Create text to display FPS
-        font = pygame.font.Font(None, 36)  # None uses default font, 36 is size
+        font = pygame.font.Font(None, 20)  # None uses default font, 36 is size
         fps_text = font.render(f'FPS: {fps}', True, (0,0,0))  # White color
             
             # Draw the FPS in the corner of the screen
-        self.screen.blit(fps_text, (10, 10))
+        self.screen.blit(fps_text, (1870, 0))
         pygame.display.flip()
         

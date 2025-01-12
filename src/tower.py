@@ -1,4 +1,4 @@
-from pygame import sprite, image, transform, draw, font
+from pygame import sprite, image, transform, draw, font, Surface, SRCALPHA
 from src.settings import TILE_SIZE
 from src.enemy import enemies_on_map
 from math import sqrt, degrees, atan2
@@ -10,6 +10,7 @@ class Tower(sprite.Sprite):
         super().__init__()
         self.name = name
         self.dmg = dmg
+        self.range = 300
         self.size = TILE_SIZE
         self.center_pos = [257,153]
         self.target_enemy = None
@@ -22,12 +23,13 @@ class Tower(sprite.Sprite):
             self.image = None
         self.font = font.Font(None, 24)
 
-    def update(self):
+    def update(self, delta_time):
         self.find_closest_target()
         self.rotate_to_target()
         self.attack_enemy()
 
     def render(self, screen):
+        # self.render_range(screen)
         if self.image:
             rect = self.image.get_rect(center=self.center_pos)
             screen.blit(self.image, rect)
@@ -37,6 +39,12 @@ class Tower(sprite.Sprite):
         text_rect = level_text.get_rect(center=(self.center_pos[0], self.center_pos[1] - self.size / 2 - 10))
         screen.blit(level_text, text_rect)
 
+    def render_range(self, screen):
+        range_surface = Surface((self.range * 2, self.range * 2), SRCALPHA).convert_alpha()
+        
+        draw.circle(range_surface, (0, 0, 0, 50), (self.range, self.range), self.range)
+
+        screen.blit(range_surface, (self.center_pos[0] - self.range, self.center_pos[1] - self.range))
 
     def __str__(self):
         return super().__str__()
@@ -71,9 +79,12 @@ class Tower(sprite.Sprite):
         if self.target_enemy == None:
             self.target_enemy = enemies[0]
         for enemy in enemies:
-            if self.distance_to_enemy(enemy) < self.distance_to_enemy(self.target_enemy):
+            if self.distance_to_enemy(enemy) < self.distance_to_enemy(self.target_enemy) \
+            and self.distance_to_enemy(enemy) <= self.range:
                 self.target_enemy = enemy
-    
+        if self.distance_to_enemy(self.target_enemy) > self.range:
+            self.target_enemy = None
+
     def distance_to_enemy(self, enemy) -> float:
         dx = self.center_pos[0] - enemy.center_pos[0]
         dy = self.center_pos[1] - enemy.center_pos[1]

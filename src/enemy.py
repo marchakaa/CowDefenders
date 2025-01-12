@@ -22,21 +22,23 @@ class Enemy(sprite.Sprite):
         else:
             self.image = None
 
-    def update(self):
+    def update(self, delta_time):
         if self.checkpoint < len(map1.map_points) - 1:
             next_target = map1.map_points[self.checkpoint + 1]
 
-            if self.center_pos[0] < next_target[0]:
-                self.center_pos[0] += self.move_speed
-            elif self.center_pos[0] > next_target[0]:
-                self.center_pos[0] -= self.move_speed
+            dx = next_target[0] - self.center_pos[0]
+            dy = next_target[1] - self.center_pos[1]
 
-            if self.center_pos[1] < next_target[1]:
-                self.center_pos[1] += self.move_speed
-            elif self.center_pos[1] > next_target[1]:
-                self.center_pos[1] -= self.move_speed
+            distance = (dx**2 + dy**2)**0.5
+            if distance != 0:
+                dx = (dx / distance) * self.move_speed * delta_time
+                dy = (dy / distance) * self.move_speed * delta_time
 
-            if self.center_pos == list(next_target):
+                self.center_pos[0] += dx
+                self.center_pos[1] += dy
+
+            if abs(next_target[0] - self.center_pos[0]) < 1 and abs(next_target[1] - self.center_pos[1]) < 1:
+                self.center_pos = list(next_target)
                 self.checkpoint += 1
         else:
             self.player.remove_health(self.damage)
@@ -77,8 +79,13 @@ class Enemy(sprite.Sprite):
         return super().__str__()
     def __repr__(self):
         return super().__repr__()
+    
+class EnemyGroup(sprite.Group):
+    def update(self, delta_time):
+        for enemy in self.sprites():
+            enemy.update()
 # Example usage
-enemy1 = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
+enemy1 = Enemy("Asni", 100, 100, "assets/maps/enemy_green_slime.png")
 # enemy2 = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
 # enemy3 = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
 enemies_on_map = sprite.Group()
