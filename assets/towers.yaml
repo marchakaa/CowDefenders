@@ -6,7 +6,7 @@ Empty:
     - "Empty"
 Cow:
   damage: 10
-  attack_speed: 1
+  attack_speed: 10
   rarity: "COMMON"
   traits:
     - "Grassland"

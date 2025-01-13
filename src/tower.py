@@ -6,10 +6,12 @@ from src.map import Tile, map1
 import os
 
 class Tower(sprite.Sprite):
-    def __init__(self, name:str, dmg:float, image_url:str=""):
+    def __init__(self, name:str, dmg:float, attack_speed: float, image_url:str=""):
         super().__init__()
         self.name = name
         self.dmg = dmg
+        self.attack_speed = attack_speed
+        self.attack_cooldown = 0
         self.range = 300
         self.size = TILE_SIZE
         self.center_pos = [257,153]
@@ -24,9 +26,12 @@ class Tower(sprite.Sprite):
         self.font = font.Font(None, 24)
 
     def update(self, delta_time):
+        if self.attack_cooldown > 0:
+            self.attack_cooldown = max(0, self.attack_cooldown - delta_time)
+
         self.find_closest_target()
         self.rotate_to_target()
-        self.attack_enemy()
+        self.attack_enemy(delta_time)
 
     def render(self, screen):
         # self.render_range(screen)
@@ -34,10 +39,20 @@ class Tower(sprite.Sprite):
             rect = self.image.get_rect(center=self.center_pos)
             screen.blit(self.image, rect)
         else:
-            draw.rect(screen, (0,255,0), (self.center_pos[0] - self.size / 2, self.center_pos[1] - self.size / 2, self.size, self.size))
+            draw.rect(screen, (0, 255, 0), (self.center_pos[0] - self.size / 2, self.center_pos[1] - self.size / 2, self.size, self.size))
+        
+        #Render level
         level_text = self.font.render(f"Lvl {self.level}", True, (255, 255, 255))
         text_rect = level_text.get_rect(center=(self.center_pos[0], self.center_pos[1] - self.size / 2 - 10))
         screen.blit(level_text, text_rect)
+
+        #Render attack cooldown indicator
+        if self.attack_cooldown > 0:
+            cooldown_pct = self.attack_cooldown / (1 / self.attack_speed)
+            draw.arc(screen, (255, 200, 0), 
+                    (self.center_pos[0] - self.size/2, self.center_pos[1] - self.size/2, 
+                     self.size, self.size), 
+                    0, cooldown_pct * 6.28, 2)
 
     def render_range(self, screen):
         range_surface = Surface((self.range * 2, self.range * 2), SRCALPHA).convert_alpha()
@@ -62,12 +77,12 @@ class Tower(sprite.Sprite):
         self.center_pos = (38 + (TILE_SIZE/2) + 84*col, 198 + (TILE_SIZE/2) + 84*row)
     def rotate_to_target(self):
         if self.target_enemy:
-            # Calculate angle to the target enemy
+            #Calculate angle to the target enemy
             dx = self.target_enemy.center_pos[0] - self.center_pos[0]
             dy = self.target_enemy.center_pos[1] - self.center_pos[1]
             self.angle = degrees(atan2(-dy, dx)) - 90 
 
-            # Rotate the image
+            #Rotate the image
             self.image = transform.rotate(self.original_image, self.angle)
 
 
@@ -104,9 +119,15 @@ class Tower(sprite.Sprite):
     def star_up(self):
         self.level += 1
 
-    def attack_enemy(self):
-        if self.target_enemy:
-            self.target_enemy.take_damage(0.1)
+    def attack_enemy(self, delta_time):
+        if self.target_enemy: 
+            if  self.target_enemy.is_dead:
+                self.target_enemy = None
+            if self.attack_cooldown <= 0:
+                self.target_enemy.take_damage(self.dmg)
+                # Set cooldown based on attacks per second
+                self.attack_cooldown = 1 / self.attack_speed
+
 
 # for j in range(0, 10):
 #     for i in range(0, 20):

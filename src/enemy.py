@@ -15,6 +15,7 @@ class Enemy(sprite.Sprite):
         self.center_pos = [MAP_START[0], MAP_START[1] + 8 * TILE_SIZE]
         self.checkpoint = 0
         self.player = None
+        self.is_dead = False
 
         if image_url:
             self.image = pygame.image.load(image_url)
@@ -72,6 +73,7 @@ class Enemy(sprite.Sprite):
             self.current_health -= amount
     def on_death(self):
         enemies_on_map.remove(self)
+        self.is_dead = True
 
     def set_player(self, player):
         self.player = player

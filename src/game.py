@@ -2,6 +2,7 @@ import pygame
 from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, TILE_SIZE
 from src.map import Tile, map1
 from src.ui import hud
+from src.wave import Wave, wave_announcement
 from src.enemy import enemies_on_map
 from src.player import player
 
@@ -16,6 +17,11 @@ class Game:
 
         pygame.display.set_caption("Cow Defenders")
         self.running = True
+
+        
+        self.current_wave, enemies_info = Wave.create_wave(1)
+        self.wave_number = 1
+        wave_announcement.show_announcement(1, enemies_info)
 
         self.clock = pygame.time.Clock()
 
@@ -35,6 +41,10 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
+                if event.key == pygame.K_SPACE:
+                    if not self.current_wave.is_active:
+                        self.current_wave.start()
+                        wave_announcement.show_announcement(self.wave_number, "Wave Starting!")
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     #Leftclick
@@ -55,6 +65,14 @@ class Game:
         #Update player
         player.update(delta_time)
         hud.update(delta_time)
+        
+        wave_announcement.update(delta_time)
+        
+        if self.current_wave.update(delta_time):
+            self.wave_number += 1
+            self.current_wave, enemies_info = Wave.create_wave(self.wave_number)
+            self.current_wave.start()
+            wave_announcement.show_announcement(self.wave_number, enemies_info)
 
     def render(self):
         self.screen.fill((0, 100, 0))
@@ -76,11 +94,17 @@ class Game:
         
         fps = int(self.clock.get_fps())
             
-            # Create text to display FPS
-        font = pygame.font.Font(None, 20)  # None uses default font, 36 is size
-        fps_text = font.render(f'FPS: {fps}', True, (0,0,0))  # White color
+            #Create text to display FPS
+        font = pygame.font.Font(None, 20)  #None uses default font, 36 is size
+        fps_color = (255 - 255 * (fps/60), 255 * (fps/60), 0);
+        fps_text = font.render(f'FPS: {fps}', True, fps_color)
             
-            # Draw the FPS in the corner of the screen
+
+        self.current_wave.render_debug(self.screen)
+        self.current_wave.render(self.screen)
+        wave_announcement.render(self.screen)
+
+            #Draw the FPS in the corner of the screen
         self.screen.blit(fps_text, (1870, 0))
         pygame.display.flip()
         

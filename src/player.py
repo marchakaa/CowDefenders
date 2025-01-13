@@ -81,7 +81,7 @@ class Player:
         card = self.shop.content[card_index]
         if card.cow_name != "Empty":
             if self.gold >= card.rarity.value:
-                tower = Tower(card.cow_name, card.damage, f'assets\maps\{card.cow_name.lower().replace(" ", "_")}.png')
+                tower = Tower(card.cow_name, card.damage, card.attack_speed, f'assets\maps\{card.cow_name.lower().replace(" ", "_")}.png')
                 added_to_bench = self.add_to_bench(tower)
                 if added_to_bench:
                     self.remove_gold(card.rarity.value)
