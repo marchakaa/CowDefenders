@@ -1,6 +1,6 @@
 import pygame
 from src.settings import TILE_SIZE
-
+from src.logger import Logger
 
 class Tile:
     def __init__(self, startPos, available=True):
@@ -29,11 +29,18 @@ class Map:
         pass
     def get_tile_by_pos(self, pos:tuple) -> Tile:
         if pos[0] >= 225 and pos[0] <= 1697 and pos[1] >= 121 and pos[1] <= 761:
-            return self.tiles[(pos[0] - 225) // 64][(pos[1] - 121) // 64]
+            col = int((pos[0] - 225) // 64)
+            row = int((pos[1] - 121) // 64)
+            return self.tiles[col][row]
     
+    @Logger.log_method()
     def make_tile_unavailable(self, tile:Tile):
         tile.available = False
+    @Logger.log_method()
+    def make_tile_available(self, tile:Tile):
+        tile.available = True
 
+    @Logger.log_method()
     def make_tiles_unavailable(self, mappoints):
         curr_row, curr_col = mappoints[0][1], mappoints[0][0]
 

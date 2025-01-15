@@ -3,6 +3,7 @@ import pygame
 import yaml
 import os
 from src.settings import RARITY_COLORS, FONT_URL
+from src.logger import Logger
 from copy import deepcopy
 
 class Rarity(Enum):
@@ -14,15 +15,15 @@ class Rarity(Enum):
     LEGENDARY = 5
 
 class Card:
-    # Class-level font cache
     _font = None
     
-    def __init__(self, cow_name: str, rarity: Rarity, damage: float, attack_speed: float, traits=None, image_size=(222, 150)):
+    def __init__(self, cow_name: str, rarity: Rarity, damage: float, attack_speed: float, attack_range: int, traits=None, image_size=(222, 150)):
         self.cow_name = cow_name
         self.traits = traits
         self.damage = damage
         self.attack_speed = attack_speed
         self.rarity = rarity
+        self.range = attack_range
         self.image_size = image_size
         self.button_rect = None
         self.is_hovered = False
@@ -72,6 +73,7 @@ class Card:
         text_rect = self.text_surface.get_rect(center=rarity_rect.center)
         screen.blit(self.text_surface, text_rect)
         
+    @Logger.log_method()
     def is_clicked(self, mouse_pos):
         return self.button_rect and self.button_rect.collidepoint(mouse_pos)
     
@@ -87,12 +89,12 @@ class Card:
             rarity=self.rarity,
             damage=self.damage,
             attack_speed=self.attack_speed,
+            attack_range=self.range,
             traits=deepcopy(self.traits) if self.traits is not None else None,
             image_size=self.image_size
         )
         return new_card
     
-
 def load_cards_from_yaml(file_path):
     with open(file_path, 'r') as file:
         data = yaml.safe_load(file)
@@ -103,6 +105,7 @@ def load_cards_from_yaml(file_path):
             rarity= Rarity[attrs['rarity']],
             damage= attrs['damage'],
             attack_speed= attrs['attack_speed'],
+            attack_range= attrs['range'],
             traits= attrs.get('traits', [])
         )
     return cards

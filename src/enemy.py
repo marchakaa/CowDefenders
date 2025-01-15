@@ -2,7 +2,9 @@ from pygame import sprite
 import pygame
 from src.map import map1, MAP_START
 from src.settings import TILE_SIZE
+from src.logger import Logger
 
+logger = Logger
 class Enemy(sprite.Sprite):
     def __init__(self, name:str, health:int, move_speed:float, image_url:str=""):
         super().__init__()
@@ -66,11 +68,15 @@ class Enemy(sprite.Sprite):
 
         pygame.draw.rect(screen, (0, 255, 0), current_health_rect)
 
+    @Logger.log_method()
     def take_damage(self, amount):
         if amount >= self.current_health:
             self.on_death()
+            logger.info(f"{self} died")
         else:
             self.current_health -= amount
+            logger.info(f"{self} took {amount} damage")
+    @Logger.log_method()
     def on_death(self):
         enemies_on_map.remove(self)
         self.is_dead = True
@@ -87,8 +93,8 @@ class EnemyGroup(sprite.Group):
         for enemy in self.sprites():
             enemy.update()
 # Example usage
-enemy1 = Enemy("Asni", 100, 100, "assets/maps/enemy_green_slime.png")
+# enemy1 = Enemy("Asni", 100, 100, "assets/maps/enemy_green_slime.png")
 # enemy2 = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
 # enemy3 = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
 enemies_on_map = sprite.Group()
-enemies_on_map.add(enemy1)
+# enemies_on_map.add(enemy1)

@@ -1,18 +1,21 @@
 from pygame import sprite, image, transform, draw, font, Surface, SRCALPHA
 from src.settings import TILE_SIZE
-from src.enemy import enemies_on_map
+from src.enemy import enemies_on_map, Enemy
 from math import sqrt, degrees, atan2
 from src.map import Tile, map1
+from src.logger import Logger
 import os
 
+logger = Logger()
+
 class Tower(sprite.Sprite):
-    def __init__(self, name:str, dmg:float, attack_speed: float, image_url:str=""):
+    def __init__(self, name:str, dmg:float, attack_speed: float, attack_range: int, image_url:str=""):
         super().__init__()
         self.name = name
         self.dmg = dmg
         self.attack_speed = attack_speed
         self.attack_cooldown = 0
-        self.range = 300
+        self.range = attack_range
         self.size = TILE_SIZE
         self.center_pos = [257,153]
         self.target_enemy = None
@@ -55,22 +58,29 @@ class Tower(sprite.Sprite):
                     0, cooldown_pct * 6.28, 2)
 
     def render_range(self, screen):
-        range_surface = Surface((self.range * 2, self.range * 2), SRCALPHA).convert_alpha()
-        
-        draw.circle(range_surface, (0, 0, 0, 50), (self.range, self.range), self.range)
+        if self.name != "Sniper Cow":
+            range_surface = Surface((self.range * 2, self.range * 2), SRCALPHA).convert_alpha()
+            draw.circle(range_surface, (0, 0, 0, 50), (self.range, self.range), self.range)
 
-        screen.blit(range_surface, (self.center_pos[0] - self.range, self.center_pos[1] - self.range))
+            screen.blit(range_surface, (self.center_pos[0] - self.range, self.center_pos[1] - self.range))
+        else:
+            range_surface = Surface((64 * 23, 64 * 10), SRCALPHA).convert_alpha()
+            draw.rect(range_surface, (0, 0, 0, 50), (0, 0, 64 * 23, 64 * 10))
+            screen.blit(range_surface, (225, 121))
 
     def __str__(self):
         return super().__str__()
     def __repr__(self):
         return super().__repr__()
     
+    @Logger.log_method()
     def set_pos(self, pos):
         self.center_pos = pos
 
+    @Logger.log_method()
     def set_position(self, tile:Tile):
         self.center_pos = tuple(coord + TILE_SIZE / 2 for coord in tile.pos_top_left)
+    @Logger.log_method()
     def set_position_bench(self, index):
         row = index // 2
         col = index % 2
@@ -96,7 +106,9 @@ class Tower(sprite.Sprite):
         for enemy in enemies:
             if self.distance_to_enemy(enemy) < self.distance_to_enemy(self.target_enemy) \
             and self.distance_to_enemy(enemy) <= self.range:
-                self.target_enemy = enemy
+                if self.target_enemy != enemy:
+                    self.target_enemy = enemy
+                    logger.info(f"{self.name} has now targeted {self.target_enemy}")
         if self.distance_to_enemy(self.target_enemy) > self.range:
             self.target_enemy = None
 
@@ -105,17 +117,20 @@ class Tower(sprite.Sprite):
         dy = self.center_pos[1] - enemy.center_pos[1]
         return sqrt(dx**2 + dy**2)
 
+    @Logger.log_method()
     def handle_left_click(self, mouse_pos):
         rect = self.image.get_rect(center=self.center_pos)
         if rect.collidepoint(mouse_pos):
             return self
 
 
+    @Logger.log_method()
     def handle_right_click(self, mouse_pos):
         rect = self.image.get_rect(center=self.center_pos)
         if rect.collidepoint(mouse_pos):
             return self
         
+    @Logger.log_method()
     def star_up(self):
         self.level += 1
 
@@ -124,9 +139,11 @@ class Tower(sprite.Sprite):
             if  self.target_enemy.is_dead:
                 self.target_enemy = None
             if self.attack_cooldown <= 0:
-                self.target_enemy.take_damage(self.dmg)
-                # Set cooldown based on attacks per second
-                self.attack_cooldown = 1 / self.attack_speed
+                if type(self.target_enemy) == Enemy:
+                    logger.info(f"{self.name} attacked {self.target_enemy}")
+                    self.target_enemy.take_damage(self.dmg)
+                    # Set cooldown based on attacks per second
+                    self.attack_cooldown = 1 / self.attack_speed
 
 
 # for j in range(0, 10):

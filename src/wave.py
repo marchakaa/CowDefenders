@@ -3,6 +3,7 @@ import pygame
 from src.enemy import Enemy, enemies_on_map
 from typing import List, Tuple, Dict
 from src.settings import FONT_URL
+from src.logger import Logger
 import random
 
 class WaveAnnouncement:
@@ -56,19 +57,19 @@ class Wave:
             "name": "Slime",
             "base_health": 100,
             "base_speed": 100,
-            "image": "assets/maps/enemy_green_slime.png"
+            "image": "assets/enemies/blue_slime.png"
         },
         "fast_slime": {
             "name": "Fast Slime",
             "base_health": 75,
             "base_speed": 150,
-            "image": "assets/maps/enemy_green_slime.png"
+            "image": "assets/enemies/red_slime.png"
         },
         "tank_slime": {
             "name": "Tank Slime",
             "base_health": 200,
             "base_speed": 75,
-            "image": "assets/maps/enemy_green_slime.png" 
+            "image": "assets/enemies/yellow_slime.png"
         }
     }
 
@@ -92,6 +93,7 @@ class Wave:
         self.enemies_spawned = 0
         self.total_enemies = self.enemy_queue.qsize()
 
+    @Logger.log_method()
     def start(self):
         self.is_active = True
         self.elapsed_time = 0
@@ -115,6 +117,7 @@ class Wave:
 
         return False
 
+    @Logger.log_method()
     def spawn_enemy(self):
         if not self.enemy_queue.empty():
             enemy = self.enemy_queue.get()
@@ -122,6 +125,7 @@ class Wave:
             self.enemies_spawned += 1
             print(f"Spawned enemy {self.enemies_spawned}/{self.total_enemies}")
 
+    @Logger.log_method()
     def complete_wave(self):
         self.is_completed = True
         self.is_active = False

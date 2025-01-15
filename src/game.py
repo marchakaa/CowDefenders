@@ -1,5 +1,8 @@
+from src.logger import Logger
+logger = Logger()
+
 import pygame
-from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, TILE_SIZE
+from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, TILE_SIZE, FONT_URL
 from src.map import Tile, map1
 from src.ui import hud
 from src.wave import Wave, wave_announcement
@@ -7,6 +10,7 @@ from src.enemy import enemies_on_map
 from src.player import player
 
 class Game:
+    @Logger.log_method()
     def __init__(self):
         display_info = pygame.display.Info()
 
@@ -24,6 +28,7 @@ class Game:
         wave_announcement.show_announcement(1, enemies_info)
 
         self.clock = pygame.time.Clock()
+        self.paused = False
 
     def run(self):
         while self.running:
@@ -31,7 +36,8 @@ class Game:
 
             self.handle_events()
 
-            self.update(delta_time)
+            if not self.paused:
+                self.update(delta_time)
 
             self.render()
 
@@ -39,23 +45,35 @@ class Game:
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_ESCAPE: # Press ESCAPE to quit game
+                    logger.info("Game Stopped")
                     self.running = False
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_p: # Press P to pause/unpause the game
+                    self.paused = not self.paused
+                    if self.paused:
+                        logger.info("Game Paused")
+                    else:
+                        logger.info("Game Unpaused")
+
+                if event.key == pygame.K_SPACE and not self.paused: # Press SPACE to start the wave
                     if not self.current_wave.is_active:
                         self.current_wave.start()
                         wave_announcement.show_announcement(self.wave_number, "Wave Starting!")
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and not self.paused:
                 if event.button == 1:
                     #Leftclick
                     pass
                 if event.button == 3:
                     #RightClick
                     pass
-                hud.handle_click_events(event.pos)
+                if hud.handle_click_events(event.pos):
+                    self.paused = not self.paused
+                    logger.info("Game Paused")
+
                 player.handle_click_event(event)
             if event.type == pygame.MOUSEMOTION:
                 player.mouse_move_event(event.pos)
+                hud.handle_mouse_move(event.pos)
             if event.type == pygame.QUIT:
                 self.running = False
         
@@ -65,9 +83,9 @@ class Game:
         #Update player
         player.update(delta_time)
         hud.update(delta_time)
-        
+        #Announce wave
         wave_announcement.update(delta_time)
-        
+        #Update wave
         if self.current_wave.update(delta_time):
             self.wave_number += 1
             self.current_wave, enemies_info = Wave.create_wave(self.wave_number)
@@ -78,11 +96,12 @@ class Game:
         self.screen.fill((0, 100, 0))
         hud.render(self.screen)
         map1.render_map(self.screen)
-        mouse_pos = pygame.mouse.get_pos()
-        x_index = (mouse_pos[0] - 225) // TILE_SIZE
-        y_index = (mouse_pos[1] - 121) // TILE_SIZE
-        if 0 <= x_index < len(map1.tiles) and 0 <= y_index < len(map1.tiles[0]):
-            map1.tiles[x_index][y_index].update(self.screen)
+        if not self.paused: # If the game is paused don't light the tiles
+            mouse_pos = pygame.mouse.get_pos()
+            x_index = (mouse_pos[0] - 225) // TILE_SIZE
+            y_index = (mouse_pos[1] - 121) // TILE_SIZE
+            if 0 <= x_index < len(map1.tiles) and 0 <= y_index < len(map1.tiles[0]):
+                map1.tiles[x_index][y_index].update(self.screen)
 
         #Render player
         player.render(self.screen)
@@ -94,9 +113,9 @@ class Game:
         
         fps = int(self.clock.get_fps())
             
-            #Create text to display FPS
-        font = pygame.font.Font(None, 20)  #None uses default font, 36 is size
-        fps_color = (255 - 255 * (fps/60), 255 * (fps/60), 0);
+            # Create text to display FPS
+        font = pygame.font.Font(None, 20)
+        fps_color = (255 - 255 * (fps/63), 255 * (fps/63), 0);
         fps_text = font.render(f'FPS: {fps}', True, fps_color)
             
 
@@ -104,7 +123,26 @@ class Game:
         self.current_wave.render(self.screen)
         wave_announcement.render(self.screen)
 
-            #Draw the FPS in the corner of the screen
+        # Draw the FPS in the corner of the screen
         self.screen.blit(fps_text, (1870, 0))
+
+        # Draw pause overlay if paused
+        if self.paused:
+            pause_surface = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
+            pause_surface.fill((0, 0, 0, 128))
+            self.screen.blit(pause_surface, (0, 0))
+            
+            # Draw pause text
+            font = pygame.font.Font(FONT_URL, 74)
+            pause_text = font.render("GAME PAUSED", True, (255, 255, 255))
+            text_rect = pause_text.get_rect(center=(self.screen_width // 2, self.screen_height // 2))
+            self.screen.blit(pause_text, text_rect)
+            
+            # Draw instruction text
+            instruction_font = pygame.font.Font(FONT_URL, 32)
+            instruction_text = instruction_font.render("Press P to Resume", True, (255, 255, 255))
+            instruction_rect = instruction_text.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 60))
+            self.screen.blit(instruction_text, instruction_rect)
+
         pygame.display.flip()
         

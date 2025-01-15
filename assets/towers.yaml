@@ -1,22 +1,37 @@
 Empty:
   damage: 0
   attack_speed: 0
+  range: 0
   rarity: "EMPTY"
   traits:
     - "Empty"
 Cow:
   damage: 10
   attack_speed: 10
+  range: 300
   rarity: "COMMON"
   traits:
-    - "Grassland"
+    - "Gunner"
     - "Milk Producer"
 
 Fire Cow:
   damage: 15
   attack_speed: 0.74
+  range: 300
   rarity: "LEGENDARY"
   traits:
-    - "Fire Resistant"
-    - "Flaming Horns"
-    - "Infernal Charge"
+    - "Elemental"
+Sniper Cow:
+  damage: 75
+  attack_speed: 0.3
+  range: 1000
+  rarity: "EPIC"
+  traits:
+    - "Gunner"
+Ice Cow:
+  damage: 5
+  attack_speed: 1
+  range: 100
+  rarity: "RARE"
+  traits:
+    - "Elemental"
