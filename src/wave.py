@@ -55,19 +55,19 @@ class Wave:
     ENEMY_TYPES = {
         "slime": {
             "name": "Slime",
-            "base_health": 100,
+            "base_health": 300,
             "base_speed": 100,
             "image": "assets/enemies/blue_slime.png"
         },
         "fast_slime": {
             "name": "Fast Slime",
-            "base_health": 75,
+            "base_health": 160,
             "base_speed": 150,
             "image": "assets/enemies/red_slime.png"
         },
         "tank_slime": {
             "name": "Tank Slime",
-            "base_health": 200,
+            "base_health": 600,
             "base_speed": 75,
             "image": "assets/enemies/yellow_slime.png"
         }

@@ -17,13 +17,17 @@ class Rarity(Enum):
 class Card:
     _font = None
     
-    def __init__(self, cow_name: str, rarity: Rarity, damage: float, attack_speed: float, attack_range: int, traits=None, image_size=(222, 150)):
+    def __init__(self, cow_name: str, rarity: Rarity, damage: float, attack_speed: float, attack_range: int, starting_fury: int, max_fury: int, fury_gain: int, fury_lock: bool, traits=None, image_size=(222, 150)):
         self.cow_name = cow_name
         self.traits = traits
         self.damage = damage
         self.attack_speed = attack_speed
         self.rarity = rarity
         self.range = attack_range
+        self.starting_fury = starting_fury
+        self.max_fury = max_fury
+        self.fury_gain = fury_gain
+        self.fury_lock = fury_lock
         self.image_size = image_size
         self.button_rect = None
         self.is_hovered = False
@@ -73,7 +77,7 @@ class Card:
         text_rect = self.text_surface.get_rect(center=rarity_rect.center)
         screen.blit(self.text_surface, text_rect)
         
-    @Logger.log_method()
+    # @Logger.log_method()
     def is_clicked(self, mouse_pos):
         return self.button_rect and self.button_rect.collidepoint(mouse_pos)
     
@@ -90,8 +94,12 @@ class Card:
             damage=self.damage,
             attack_speed=self.attack_speed,
             attack_range=self.range,
+            starting_fury=self.starting_fury,
+            max_fury=self.max_fury,
+            fury_gain=self.fury_gain,
+            fury_lock=self.fury_lock,
             traits=deepcopy(self.traits) if self.traits is not None else None,
-            image_size=self.image_size
+            image_size=self.image_size,
         )
         return new_card
     
@@ -106,6 +114,10 @@ def load_cards_from_yaml(file_path):
             damage= attrs['damage'],
             attack_speed= attrs['attack_speed'],
             attack_range= attrs['range'],
+            starting_fury= attrs['starting_fury'],
+            max_fury= attrs['max_fury'],
+            fury_gain= attrs['fury_gain'],
+            fury_lock= attrs['fury_lock'],
             traits= attrs.get('traits', [])
         )
     return cards

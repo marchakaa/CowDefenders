@@ -3,6 +3,7 @@ import pygame
 from src.map import map1, MAP_START
 from src.settings import TILE_SIZE
 from src.logger import Logger
+from src.effects import EffectManager, Effect
 
 logger = Logger
 class Enemy(sprite.Sprite):
@@ -18,6 +19,7 @@ class Enemy(sprite.Sprite):
         self.checkpoint = 0
         self.player = None
         self.is_dead = False
+        self.effect_manager = EffectManager()
 
         if image_url:
             self.image = pygame.image.load(image_url)
@@ -25,7 +27,7 @@ class Enemy(sprite.Sprite):
         else:
             self.image = None
 
-    def update(self, delta_time):
+    def update(self, delta_time: float):
         if self.checkpoint < len(map1.map_points) - 1:
             next_target = map1.map_points[self.checkpoint + 1]
 
@@ -46,6 +48,7 @@ class Enemy(sprite.Sprite):
         else:
             self.player.remove_health(self.damage)
             self.on_death()
+        self.effect_manager.update(delta_time, self)
 
     def render(self, screen):
         if self.image:
@@ -67,29 +70,34 @@ class Enemy(sprite.Sprite):
         pygame.draw.rect(screen, (128, 128, 128), health_bar_background)
 
         pygame.draw.rect(screen, (0, 255, 0), current_health_rect)
-
-    @Logger.log_method()
-    def take_damage(self, amount):
+    def heal(self, amount: float) -> None:
+        self.current_health = min (self.max_health, self.current_health + amount)
+    # @Logger.log_method()
+    def take_damage(self, amount: float) -> None:
         if amount >= self.current_health:
             self.on_death()
             logger.info(f"{self} died")
         else:
             self.current_health -= amount
-            logger.info(f"{self} took {amount} damage")
+            # logger.info(f"{self} took {amount} damage")
     @Logger.log_method()
-    def on_death(self):
+    def on_death(self) -> None:
         enemies_on_map.remove(self)
         self.is_dead = True
 
-    def set_player(self, player):
+    def set_player(self, player) -> None:
         self.player = player
+
+    def apply_effect(self, effect: Effect) -> None:
+        self.effect_manager.add_effect(effect)
+
     def __str__(self):
         return super().__str__()
     def __repr__(self):
         return super().__repr__()
     
 class EnemyGroup(sprite.Group):
-    def update(self, delta_time):
+    def update(self, delta_time: float):
         for enemy in self.sprites():
             enemy.update()
 # Example usage

@@ -2,6 +2,10 @@ Empty:
   damage: 0
   attack_speed: 0
   range: 0
+  max_fury: 0
+  starting_fury: 0
+  fury_gain: 0
+  fury_lock: false
   rarity: "EMPTY"
   traits:
     - "Empty"
@@ -9,29 +13,45 @@ Cow:
   damage: 10
   attack_speed: 10
   range: 300
+  max_fury: 100
+  starting_fury: 30
+  fury_gain: 5
+  fury_lock: true
   rarity: "COMMON"
   traits:
     - "Gunner"
     - "Milk Producer"
 
 Fire Cow:
-  damage: 15
-  attack_speed: 0.74
+  damage: 5
+  attack_speed: 1.5
   range: 300
+  max_fury: 40
+  starting_fury: 0
+  fury_gain: 10
+  fury_lock: false
   rarity: "LEGENDARY"
   traits:
     - "Elemental"
 Sniper Cow:
   damage: 75
-  attack_speed: 0.3
+  attack_speed: 0.5
   range: 1000
+  max_fury: 100
+  starting_fury: 50
+  fury_gain: 10
+  fury_lock: true
   rarity: "EPIC"
   traits:
     - "Gunner"
 Ice Cow:
   damage: 5
   attack_speed: 1
-  range: 100
+  range: 300
+  max_fury: 70
+  starting_fury: 30
+  fury_gain: 10
+  fury_lock: false
   rarity: "RARE"
   traits:
     - "Elemental"
