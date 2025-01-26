@@ -7,21 +7,33 @@ Empty:
   fury_gain: 0
   fury_lock: false
   rarity: "EMPTY"
+  target_type: "CLOSEST_TARGET"
   traits:
     - "Empty"
+  levels:
+    level_2:
+    level_3:
 Cow:
   damage: 10
-  attack_speed: 10
+  attack_speed: 3
   range: 300
   max_fury: 100
   starting_fury: 30
   fury_gain: 5
   fury_lock: true
   rarity: "COMMON"
+  target_type: "FIRST_TARGET"
   traits:
     - "Gunner"
     - "Milk Producer"
-
+  level_2:
+    damage: 15
+    attack_speed: 3.5
+    range: 300
+    fury_gain: 5
+  level_3:
+    damage: 25
+    attack_speed: 4
 Fire Cow:
   damage: 5
   attack_speed: 1.5
@@ -31,6 +43,7 @@ Fire Cow:
   fury_gain: 10
   fury_lock: false
   rarity: "LEGENDARY"
+  target_type: "LAST_TARGET"
   traits:
     - "Elemental"
 Sniper Cow:
@@ -42,6 +55,7 @@ Sniper Cow:
   fury_gain: 10
   fury_lock: true
   rarity: "EPIC"
+  target_type: "HIGHEST_HEALTH_TARGET"
   traits:
     - "Gunner"
 Ice Cow:
@@ -53,5 +67,6 @@ Ice Cow:
   fury_gain: 10
   fury_lock: false
   rarity: "RARE"
+  target_type: "CLOSEST_TARGET"
   traits:
     - "Elemental"

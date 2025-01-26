@@ -95,14 +95,10 @@ class Enemy(sprite.Sprite):
         return super().__str__()
     def __repr__(self):
         return super().__repr__()
+
     
 class EnemyGroup(sprite.Group):
     def update(self, delta_time: float):
         for enemy in self.sprites():
             enemy.update()
-# Example usage
-# enemy1 = Enemy("Asni", 100, 100, "assets/maps/enemy_green_slime.png")
-# enemy2 = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
-# enemy3 = Enemy("Asni", 100, 2, "assets/maps/enemy_green_slime.png")
 enemies_on_map = sprite.Group()
-# enemies_on_map.add(enemy1)

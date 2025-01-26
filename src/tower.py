@@ -1,15 +1,28 @@
 from pygame import sprite, image, transform, draw, font, Surface, SRCALPHA
+from math import sqrt, degrees, atan2
+from enum import Enum
+import yaml
+
 from src.settings import TILE_SIZE
 from src.enemy import enemies_on_map, Enemy
-from math import sqrt, degrees, atan2
 from src.map import Tile, map1
 from src.logger import Logger
 import src.effects as effects
 
+
 logger = Logger()
 
+
+class TargetType(Enum):
+    CLOSEST_TARGET = "CLOSEST_TARGET"
+    FIRST_TARGET = "FIRST_TARGET"
+    LAST_TARGET = "LAST_TARGET"
+    HIGHEST_HEALTH_TARGET = "HIGHEST_HEALTH_TARGET"
+    LOWEST_HEALTH_TARGET = "LOWEST_HEALTH_TARGET"
+
 class Tower(sprite.Sprite):
-    def __init__(self, name:str, dmg:float, attack_speed: float, attack_range: int, starting_fury: int, max_fury: int, fury_gain: int, fury_lock: bool, image_url:str=""):
+    def __init__(self, name:str, dmg:float, attack_speed: float, attack_range: int, starting_fury: int, max_fury: int, \
+                 fury_gain: int, fury_lock: bool, target_type: TargetType, image_url:str=""):
         super().__init__()
         #BASIC STATS
         self.name = name
@@ -18,6 +31,7 @@ class Tower(sprite.Sprite):
         self.level = 1        
         self.ability = TOWER_ABILITY_MAP[self.name]
         self.fury_lock = fury_lock
+        self.target_type = TargetType(target_type)
         #BASE STATS
         self.base_dmg = dmg
         self.base_attack_speed = attack_speed
@@ -135,16 +149,22 @@ class Tower(sprite.Sprite):
         if not enemies:
             self.target_enemy = None
             return
-        if self.target_enemy == None:
-            self.target_enemy = enemies[0]
-        for enemy in enemies:
-            if self.distance_to_enemy(enemy) < self.distance_to_enemy(self.target_enemy) \
-            and self.distance_to_enemy(enemy) <= self.get_total_range():
-                if self.target_enemy != enemy:
-                    self.target_enemy = enemy
-                    logger.info(f"{self.name} has now targeted {self.target_enemy}")
-        if self.distance_to_enemy(self.target_enemy) > self.get_total_range():
+
+        in_range_enemies = [enemy for enemy in enemies if self.distance_to_enemy(enemy) <= self.get_total_range()]
+        if not in_range_enemies:
             self.target_enemy = None
+            return
+
+        if self.target_type == TargetType.CLOSEST_TARGET:
+            self.target_enemy = min(in_range_enemies, key=self.distance_to_enemy)
+        elif self.target_type == TargetType.FIRST_TARGET:
+            self.target_enemy = max(in_range_enemies, key=lambda enemy: enemy.checkpoint)
+        elif self.target_type == TargetType.LAST_TARGET:
+            self.target_enemy = min(in_range_enemies, key=lambda enemy: enemy.checkpoint)
+        elif self.target_type == TargetType.HIGHEST_HEALTH_TARGET:
+            self.target_enemy = max(in_range_enemies, key=lambda enemy: enemy.current_health)
+        elif self.target_type == TargetType.LOWEST_HEALTH_TARGET:
+            self.target_enemy = min(in_range_enemies, key=lambda enemy: enemy.current_health)
 
     def distance_to_enemy(self, enemy) -> float:
         dx = self.center_pos[0] - enemy.center_pos[0]
@@ -196,6 +216,22 @@ class Tower(sprite.Sprite):
     @Logger.log_method()
     def star_up(self):
         self.level += 1
+
+        with open("assets/towers.yaml", 'r') as file:
+            data = yaml.safe_load(file)
+        attrs = data.get(self.name)
+
+        if not attrs:
+            return
+
+        level_attrs = attrs.get(f'level_{self.level}')
+        if not level_attrs:
+            return
+
+        self.base_dmg = level_attrs.get('damage', self.base_dmg)
+        self.base_attack_speed = level_attrs.get('attack_speed', self.base_attack_speed)
+        self.base_range = level_attrs.get('range', self.base_range)
+        self.base_fury_gain = level_attrs.get('fury_gain', self.base_fury_gain)
 
     def add_fury(self):
         if self.ability.active and self.fury_lock:

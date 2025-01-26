@@ -5,6 +5,7 @@ class Effect:
         self.elapsed_time = 0
         self.is_active = True
     def reapply(self):
+        #REAPPLY HAPPENS WHEN THE EFFECT IS ADDED, WHILE STILL ACTIVE
         self.elapsed_time = 0
     def update(self, delta_time: float, target):
         if self.elapsed_time >= self.duration:
@@ -33,6 +34,7 @@ class EffectManager:
                 self.effects.remove(effect)
 
 class BurnEffect(Effect):
+    #BURN EFFECT DEALS DAMAGE OVERTIME
     def __init__(self, damage, duration=0):
         super().__init__("Burn", duration)
         self.dps = damage
@@ -53,6 +55,7 @@ class BurnEffect(Effect):
             self.is_active = False
             
 class SlowEffect(Effect):
+    #SLOW EFFECT SLOWS THE TARGET FOR ANY AMOUNT OF TIME
     def __init__(self, duration=5, percentage=0, amount=0):
         super().__init__("Slow", duration)
         self.percentage = percentage
@@ -83,6 +86,7 @@ class SlowEffect(Effect):
             self.remove(target)
 
 class Regeneration(Effect):
+    #REGENERATION HEALS THE TARGET OVERTIME
     def __init__(self, hps, duration=0):
         super().__init__("Regeneration", duration)
         self.hps = hps
@@ -98,6 +102,20 @@ class Regeneration(Effect):
             hp = ticks * self.hps
             target.heal(hp)
             self.tick_accumulator %= self.tick_interval
+
+        if self.elapsed_time >= self.duration:
+            self.is_active = False
+
+class Strength(Effect):
+    #STRENGTH GIVES BONUS DAMAGE TO THE TARGET
+    def __init__(self, dmg_amount=0, dmg_percent=0, duration=0):
+        super().__init__("Strength", duration)
+        self.dmg_amount = dmg_amount
+        self.dmg_percent = dmg_percent
+    def update(self, delta_time: float, target):
+        if not self.is_active:
+            return
+        self.elapsed_time += delta_time
 
         if self.elapsed_time >= self.duration:
             self.is_active = False

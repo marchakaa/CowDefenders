@@ -17,10 +17,11 @@ class Rarity(Enum):
 class Card:
     _font = None
     
-    def __init__(self, cow_name: str, rarity: Rarity, damage: float, attack_speed: float, attack_range: int, starting_fury: int, max_fury: int, fury_gain: int, fury_lock: bool, traits=None, image_size=(222, 150)):
+    def __init__(self, cow_name: str, rarity: Rarity, damage: float, attack_speed: float, attack_range: int, starting_fury: int, \
+                 max_fury: int, fury_gain: int, fury_lock: bool, target_type: str, traits=None, image_size=(222, 150)):
         self.cow_name = cow_name
-        self.traits = traits
         self.damage = damage
+        self.traits = traits
         self.attack_speed = attack_speed
         self.rarity = rarity
         self.range = attack_range
@@ -28,6 +29,7 @@ class Card:
         self.max_fury = max_fury
         self.fury_gain = fury_gain
         self.fury_lock = fury_lock
+        self.target_type = target_type
         self.image_size = image_size
         self.button_rect = None
         self.is_hovered = False
@@ -98,6 +100,7 @@ class Card:
             max_fury=self.max_fury,
             fury_gain=self.fury_gain,
             fury_lock=self.fury_lock,
+            target_type=self.target_type,
             traits=deepcopy(self.traits) if self.traits is not None else None,
             image_size=self.image_size,
         )
@@ -118,6 +121,7 @@ def load_cards_from_yaml(file_path):
             max_fury= attrs['max_fury'],
             fury_gain= attrs['fury_gain'],
             fury_lock= attrs['fury_lock'],
+            target_type= attrs['target_type'],
             traits= attrs.get('traits', [])
         )
     return cards

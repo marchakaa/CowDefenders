@@ -89,9 +89,9 @@ class Player:
             draw.rect(screen, (255, 200, 0), (1697, 357, x, 10))
             draw.rect(screen, (0, 0, 0), (1697 + x, 357, 223 - x, 10))
             
-            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.dmg), True, (255,255,255)) , (1750, 357)) #1697
-            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.attack_speed), True, (255,255,255)) , (1750, 387))
-            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.range), True, (255,255,255)) , (1750, 417))
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_dmg), True, (255,255,255)) , (1750, 357)) #1697
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_attack_speed), True, (255,255,255)) , (1750, 387))
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_range), True, (255,255,255)) , (1750, 417))
 
             #Add square to display the cow information
 
@@ -113,7 +113,9 @@ class Player:
         card = self.shop.content[card_index]
         if card.cow_name != "Empty":
             if self.gold >= card.rarity.value:
-                tower = Tower(card.cow_name, card.damage, card.attack_speed, card.range, card.starting_fury, card.max_fury, card.fury_gain, card.fury_lock, f'assets\\towers\{card.cow_name.lower().replace(" ", "_")}.png')
+                tower = Tower(card.cow_name, card.damage, card.attack_speed, card.range, \
+                              card.starting_fury, card.max_fury, card.fury_gain, card.fury_lock, card.target_type, \
+                                f'assets\\towers\{card.cow_name.lower().replace(" ", "_")}.png')
                 added_to_bench = self.add_to_bench(tower)
                 if added_to_bench:
                     self.remove_gold(card.rarity.value)
