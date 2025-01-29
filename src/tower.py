@@ -260,6 +260,12 @@ class TowerAbility():
         self.duration = duration
         self.has_duration = has_duration
 
+    def __str__(self) -> str:
+        base_info = f"{self.name}\nFury Cost: {self.fury_cost}"
+        if self.has_duration:
+            return f"{base_info}\nDuration: {self.duration:.1f}s"
+        return base_info
+    
     def activate(self):
         pass
     def deactivate(self):
@@ -311,6 +317,8 @@ class IceNovaAbility(TowerAbility): #Ice Cow
         self.active = True
     def deactivate(self, tower: Tower):
         pass
+    def __str__(self) -> str:
+        return f"Stuns all the slimes in {self.range} range for {self.duration} seconds"
 
 class DeadeyeAbility(TowerAbility):
     def __init__(self):

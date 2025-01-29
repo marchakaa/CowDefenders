@@ -2,7 +2,7 @@ from src.tower import Tower
 from src.shop import Shop
 from src.tower import Tower
 from src.settings import BENCH_SIZE, FONT_URL
-from pygame import sprite, font, draw
+from pygame import sprite, font, draw, image, mouse
 from src.map import map1
 from src.logger import Logger
 
@@ -83,23 +83,61 @@ class Player:
         if self.cow_on_hold:
             self.cow_on_hold.render(screen)
         if self.clicked_cow:
+            #Render range
             self.clicked_cow.render_range(screen)
-            percent = self.clicked_cow.current_fury / self.clicked_cow.max_fury
-            x = 223 * percent
-            draw.rect(screen, (255, 200, 0), (1697, 357, x, 10))
-            draw.rect(screen, (0, 0, 0), (1697 + x, 357, 223 - x, 10))
-            
-            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_dmg), True, (255,255,255)) , (1750, 357)) #1697
-            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_attack_speed), True, (255,255,255)) , (1750, 387))
-            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_range), True, (255,255,255)) , (1750, 417))
-
-            #Add square to display the cow information
+            #Render cow card with stats
+            self.render_cow_card(screen)
 
         #Render money
         self.render_gold(screen)
         #Render health
         self.render_health(screen)
-            
+    def render_cow_card(self, screen):
+            #Icon
+            cow_image = image.load(f"assets/cards/empty_card.png")
+            screen.blit(cow_image, (1698, 213))
+            #Fury
+            percent = self.clicked_cow.current_fury / self.clicked_cow.max_fury
+            x = 223 * percent
+            draw.rect(screen, (255, 200, 0), (1697, 357, x, 5))
+            draw.rect(screen, (0, 0, 0), (1697 + x, 357, 223 - x, 5))
+            #Icons
+            image_dmg = image.load("assets/icons/icon_dmg.png")
+            image_fury = image.load("assets/icons/icon_fury.png")
+            image_attack_speed = image.load("assets/icons/icon_attack_speed.png")
+            image_attack_range = image.load("assets/icons/icon_attack_range.png")
+            screen.blit(image_dmg, (1710, 370))
+            screen.blit(image_fury, (1710, 410))
+            screen.blit(image_attack_speed, (1710, 450))
+            screen.blit(image_attack_range, (1710, 490))
+            #Name
+            name_surface = PLAYER_TEXT.render(str(self.clicked_cow.name), True, (255,255,255))
+            card_left = 1697
+            card_width = 223
+            text_x = card_left + (card_width - name_surface.get_width()) // 2
+            screen.blit(name_surface, (text_x, 317))
+            #Stats
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_dmg), True, (255,255,255)) , (1750, 370)) #1697
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_fury_gain), True, (255,255,255)) , (1750, 410))
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_attack_speed), True, (255,255,255)) , (1750, 450))
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_range), True, (255,255,255)) , (1750, 490))
+            #Ability
+            square_size = 40
+            square_y = 530
+            square_x = card_left + (card_width - square_size) // 2
+            # Red square (template)
+            draw.rect(screen, (255, 0, 0), (square_x, square_y, square_size, square_size))
+            #Display ability info
+            mouse_pos = mouse.get_pos()
+            if (square_x <= mouse_pos[0] <= square_x + square_size and 
+                square_y <= mouse_pos[1] <= square_y + square_size):
+                ability_info = str(self.clicked_cow.ability).split('\n')
+                line_height = INFO_TEXT.get_linesize()
+                for i, line in enumerate(ability_info):
+                    text_surface = INFO_TEXT.render(line, True, (255, 255, 255))
+                    text_x = card_left + (card_width - text_surface.get_width()) // 2
+                    text_y = square_y + square_size + 10 + (i * line_height)
+                    screen.blit(text_surface, (text_x, text_y))
     def transition_color_health_bar(self) -> None:
 
         start_r, start_g, start_b = 172, 50, 50
@@ -243,3 +281,5 @@ class Player:
 
 player = Player()
 PLAYER_TEXT = font.Font(FONT_URL, 28)
+INFO_TEXT = font.Font(FONT_URL, 13)
+ABILITY_TEXT = font.Font(FONT_URL, 18)
