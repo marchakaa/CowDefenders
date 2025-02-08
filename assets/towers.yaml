@@ -46,6 +46,12 @@ Fire Cow:
   target_type: "LAST_TARGET"
   traits:
     - "Elemental"
+  level_2:
+    attack_speed: 1.75
+    fury_gain: 15
+  level_3:
+    fury_gain: 40
+    attack_speed: 3
 Sniper Cow:
   damage: 75
   attack_speed: 0.5

@@ -117,10 +117,15 @@ class Player:
             text_x = card_left + (card_width - name_surface.get_width()) // 2
             screen.blit(name_surface, (text_x, 317))
             #Stats
-            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_dmg), True, (255,255,255)) , (1750, 370)) #1697
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_dmg), True, (255,255,255)) , (1750, 370))
             screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_fury_gain), True, (255,255,255)) , (1750, 410))
             screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_attack_speed), True, (255,255,255)) , (1750, 450))
             screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.base_range), True, (255,255,255)) , (1750, 490))
+            #Bonus Stats
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.get_total_dmg()), True, (255,255,255)) , (1850, 370))
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.get_total_fury_gain()), True, (255,255,255)) , (1850, 410))
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.get_total_attack_speed()), True, (255,255,255)) , (1850, 450))
+            screen.blit(PLAYER_TEXT.render(str(self.clicked_cow.get_total_range()), True, (255,255,255)) , (1850, 490))
             #Ability
             square_size = 40
             square_y = 530

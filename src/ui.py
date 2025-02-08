@@ -6,7 +6,7 @@ logger = Logger()
 pygame.init()
 
 class Hud:
-    def __init__(self, image_url):
+    def __init__(self, image_url: str):
         # Load and convert image for faster blitting
         self.image = pygame.image.load(image_url)
         self.font = pygame.font.Font(FONT_URL, 32)
@@ -22,7 +22,7 @@ class Hud:
         self.ui_surface.blit(self.image, (0, 0))
         self.ui_surface.blit(self.bench_text, (70, 120))
 
-    def update(self, delta_time):
+    def update(self, delta_time: float):
         self.time += delta_time
 
     def render(self, screen):
@@ -48,6 +48,51 @@ class Hud:
         if self.pause_button_rect.collidepoint(mouse_pos):
             logger.info("Pause Clicked")
             return True
+
+class PauseMenu:
+    def __init__(self, screen):
+        self.screen = screen
+        self.background_color = (68, 45, 39)
+        self.width, self.height = 600, 720
+        self.x, self.y = (screen.get_width() - self.width) // 2, (screen.get_height() - self.height) // 2
+        
+        self.font = pygame.font.Font(FONT_URL, 36)
+        
+        self.menu_text = self.font.render("Menu", True, (255, 255, 255))
+        self.resume_button = pygame.Rect(self.x + 150, self.y + 200, 300, 60)
+        self.save_button = pygame.Rect(self.x + 150, self.y + 300, 300, 60)
+        self.exit_button = pygame.Rect(self.x + 150, self.y + 400, 300, 60)
+        
+    def render(self, mouse_pos):
+        
+        pygame.draw.rect(self.screen, self.background_color, (self.x, self.y, self.width, self.height))
+        self.screen.blit(self.menu_text, (self.x + (self.width - self.menu_text.get_width()) // 2, self.y + 50))
+        
+        self.draw_button(self.resume_button, "Resume(P)", mouse_pos)
+        self.draw_button(self.exit_button, "Exit Game", mouse_pos)
+        self.draw_button(self.save_button, "Save Game", mouse_pos)
+        
+    def draw_button(self, button_rect, text, mouse_pos):
+        is_hovered = button_rect.collidepoint(mouse_pos)
+        button_color = (255, 255, 255) if is_hovered else (68, 45, 39)
+        text_color = (68, 45, 39) if is_hovered else (255, 255, 255)
+        
+        pygame.draw.rect(self.screen, button_color, button_rect)
+        pygame.draw.rect(self.screen, (255, 255, 255), button_rect, 2)
+        text_surface = self.font.render(text, True, text_color)
+        text_x = button_rect.x + (button_rect.width - text_surface.get_width()) // 2
+        text_y = button_rect.y + (button_rect.height - text_surface.get_height()) // 2
+        self.screen.blit(text_surface, (text_x, text_y))
+    
+    def handle_click_events(self, mouse_pos):
+        
+        if self.resume_button.collidepoint(mouse_pos):
+            return "resume"
+        elif self.exit_button.collidepoint(mouse_pos):
+            return "exit"
+        elif self.save_button.collidepoint(mouse_pos):
+            return "save"
+        return None
 
 
 hud = Hud("assets\\ui\\ui.png")

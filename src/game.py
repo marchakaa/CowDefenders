@@ -4,7 +4,7 @@ logger = Logger()
 import pygame
 from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, TILE_SIZE, FONT_URL
 from src.map import Tile, map1
-from src.ui import hud
+from src.ui import hud, PauseMenu
 from src.wave import Wave, wave_announcement
 from src.enemy import enemies_on_map
 from src.player import player
@@ -18,10 +18,11 @@ class Game:
         self.screen_width = display_info.current_w
         self.screen_height = display_info.current_h
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height), pygame.FULLSCREEN  | pygame.HWSURFACE)
+        self.pause_menu = PauseMenu(self.screen)
 
         pygame.display.set_caption("Cow Defenders")
-        self.running = True
 
+        self.running = True
         
         self.current_wave, enemies_info = Wave.create_wave(1)
         self.wave_number = 1
@@ -59,14 +60,19 @@ class Game:
                     if not self.current_wave.is_active:
                         self.current_wave.start()
                         wave_announcement.show_announcement(self.wave_number, "Wave Starting!")
-            if event.type == pygame.MOUSEBUTTONDOWN and not self.paused:
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    #Leftclick
-                    pass
+                    #Pause menu handling
+                    if self.paused:
+                        result = self.pause_menu.handle_click_events(event.pos)
+                        match result:
+                            case "resume": self.paused = not self.paused
+                            case "exit": self.running = False
+                        print(f"Event handle click {result}")
                 if event.button == 3:
                     #RightClick
                     pass
-                if hud.handle_click_events(event.pos):
+                if hud.handle_click_events(event.pos) and not self.paused:
                     self.paused = not self.paused
                     logger.info("Game Paused")
 
@@ -126,23 +132,14 @@ class Game:
         # Draw the FPS in the corner of the screen
         self.screen.blit(fps_text, (1870, 0))
 
-        # Draw pause overlay if paused
+        # Draw pause menu overlay if paused
         if self.paused:
             pause_surface = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
             pause_surface.fill((0, 0, 0, 128))
             self.screen.blit(pause_surface, (0, 0))
             
-            # Draw pause text
-            font = pygame.font.Font(FONT_URL, 74)
-            pause_text = font.render("GAME PAUSED", True, (255, 255, 255))
-            text_rect = pause_text.get_rect(center=(self.screen_width // 2, self.screen_height // 2))
-            self.screen.blit(pause_text, text_rect)
-            
-            # Draw instruction text
-            instruction_font = pygame.font.Font(FONT_URL, 32)
-            instruction_text = instruction_font.render("Press P to Resume", True, (255, 255, 255))
-            instruction_rect = instruction_text.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 60))
-            self.screen.blit(instruction_text, instruction_rect)
+            mouse_pos = pygame.mouse.get_pos()
+            self.pause_menu.render(mouse_pos)
 
         pygame.display.flip()
         

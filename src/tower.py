@@ -232,6 +232,7 @@ class Tower(sprite.Sprite):
         self.base_attack_speed = level_attrs.get('attack_speed', self.base_attack_speed)
         self.base_range = level_attrs.get('range', self.base_range)
         self.base_fury_gain = level_attrs.get('fury_gain', self.base_fury_gain)
+        self.ability.upgrade(self)
 
     def add_fury(self):
         if self.ability.active and self.fury_lock:
@@ -270,6 +271,8 @@ class TowerAbility():
         pass
     def deactivate(self):
         pass        
+    def upgrade(self, level: int):
+        pass
     def update(self, tower: Tower, delta_time: float):
         if self.active and self.has_duration:
             self.elapsed_time += delta_time
@@ -296,13 +299,31 @@ class BlazeAbility(TowerAbility): #Fire Cow
     def __init__(self):
         super().__init__(40, "Blaze")
         self.stacks = 0
+        self.stack_dmg_amplifier = 0.5
 
     def activate(self, tower: Tower):
         if self.stacks >= 25:
+            burn_dmg = 10 + 0.1*tower.get_total_dmg()
             tower.appliable_effects.append(effects.BurnEffect(10, 5))
+        if self.stacks == 50:
+            tower.bonus_range += 100
+        if self.stacks == 100:
+            tower.bonus_range += 100
         self.stacks += 1
-        tower.bonus_dmg += 0.5
+        tower.bonus_dmg += self.stack_dmg_amplifier
         self.active = True
+    
+    def upgrade(self, tower: Tower):
+        if tower.level == 2:
+            tower.bonus_dmg -= self.stacks*self.stack_dmg_amplifier
+            self.stack_dmg_amplifier *= 2
+            tower.bonus_dmg += self.stacks*self.stack_dmg_amplifier
+        if tower.level == 3:
+            tower.bonus_dmg -= self.stacks*self.stack_dmg_amplifier
+            self.stack_dmg_amplifier *= 2.5
+            tower.bonus_dmg += self.stacks*self.stack_dmg_amplifier
+    def __str__(self) -> str:
+        return f"Stacks: {self.stacks}, bonus damage: {self.stacks*self.stack_dmg_amplifier}"
 
 class IceNovaAbility(TowerAbility): #Ice Cow
     def __init__(self):
