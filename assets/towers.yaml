@@ -35,7 +35,7 @@ Cow:
     damage: 25
     attack_speed: 4
 Fire Cow:
-  damage: 5
+  damage: 30
   attack_speed: 1.5
   range: 300
   max_fury: 40
@@ -55,7 +55,7 @@ Fire Cow:
 Sniper Cow:
   damage: 75
   attack_speed: 0.5
-  range: 1000
+  range: 600
   max_fury: 100
   starting_fury: 50
   fury_gain: 10
@@ -64,6 +64,16 @@ Sniper Cow:
   target_type: "HIGHEST_HEALTH_TARGET"
   traits:
     - "Gunner"
+  level_2:
+    damage: 100
+    attack_speed: 0.75
+    fury_gain: 12
+    range: 800
+  level_3:
+    damage: 150
+    fury_gain: 20
+    attack_speed: 1.25
+    range: 1000
 Ice Cow:
   damage: 5
   attack_speed: 1
@@ -73,6 +83,24 @@ Ice Cow:
   fury_gain: 10
   fury_lock: false
   rarity: "RARE"
+  target_type: "CLOSEST_TARGET"
+  traits:
+    - "Elemental"
+  level_2:
+    fury_gain: 11
+    range: 330
+  level_3:
+    fury_gain: 12
+    range: 370
+Air Cow:
+  damage: 5
+  attack_speed: 1
+  range: 300
+  max_fury: 70
+  starting_fury: 30
+  fury_gain: 10
+  fury_lock: false
+  rarity: "UNCOMMON"
   target_type: "CLOSEST_TARGET"
   traits:
     - "Elemental"

@@ -7,7 +7,7 @@ from src.effects import EffectManager, Effect
 
 logger = Logger
 class Enemy(sprite.Sprite):
-    def __init__(self, name:str, health:int, move_speed:float, image_url:str=""):
+    def __init__(self, name:str, health:int, move_speed:float, image_url:str="") -> None:
         super().__init__()
         self.name = name
         self.max_health = health
@@ -27,30 +27,30 @@ class Enemy(sprite.Sprite):
         else:
             self.image = None
 
-    def update(self, delta_time: float):
+    def update(self, delta_time: float) -> None:
         if self.checkpoint < len(map1.map_points) - 1:
             next_target = map1.map_points[self.checkpoint + 1]
 
-            dx = next_target[0] - self.center_pos[0]
-            dy = next_target[1] - self.center_pos[1]
+            direction = pygame.Vector2(next_target) - pygame.Vector2(self.center_pos)
+            distance = direction.length()
 
-            distance = (dx**2 + dy**2)**0.5
-            if distance != 0:
-                dx = (dx / distance) * self.move_speed * delta_time
-                dy = (dy / distance) * self.move_speed * delta_time
+            if distance > 0:
+                direction = direction.normalize()
+                movement = direction * self.move_speed * delta_time
 
-                self.center_pos[0] += dx
-                self.center_pos[1] += dy
-
-            if abs(next_target[0] - self.center_pos[0]) < 1 and abs(next_target[1] - self.center_pos[1]) < 1:
-                self.center_pos = list(next_target)
-                self.checkpoint += 1
+                if movement.length() >= distance:
+                    self.center_pos = list(next_target)
+                    self.checkpoint += 1
+                else:
+                    self.center_pos[0] += movement.x
+                    self.center_pos[1] += movement.y
         else:
             self.player.remove_health(self.damage)
             self.on_death()
+
         self.effect_manager.update(delta_time, self)
 
-    def render(self, screen):
+    def render(self, screen: pygame.Surface) -> None:
         if self.image:
             rect = self.image.get_rect(center=self.center_pos)
             screen.blit(self.image, rect)
@@ -91,14 +91,14 @@ class Enemy(sprite.Sprite):
     def apply_effect(self, effect: Effect) -> None:
         self.effect_manager.add_effect(effect)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return super().__str__()
-    def __repr__(self):
+    def __repr__(self) -> str:
         return super().__repr__()
 
     
 class EnemyGroup(sprite.Group):
-    def update(self, delta_time: float):
+    def update(self, delta_time: float) -> None:
         for enemy in self.sprites():
-            enemy.update()
+            enemy.update(delta_time)
 enemies_on_map = sprite.Group()

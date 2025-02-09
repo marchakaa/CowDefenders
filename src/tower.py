@@ -1,6 +1,7 @@
 from pygame import sprite, image, transform, draw, font, Surface, SRCALPHA
 from math import sqrt, degrees, atan2
 from enum import Enum
+from typing import Tuple
 import yaml
 
 from src.settings import TILE_SIZE
@@ -22,14 +23,14 @@ class TargetType(Enum):
 
 class Tower(sprite.Sprite):
     def __init__(self, name:str, dmg:float, attack_speed: float, attack_range: int, starting_fury: int, max_fury: int, \
-                 fury_gain: int, fury_lock: bool, target_type: TargetType, image_url:str=""):
+                 fury_gain: int, fury_lock: bool, target_type: TargetType, image_url:str="") -> None:
         super().__init__()
         #BASIC STATS
         self.name = name
         self.current_fury = starting_fury
         self.max_fury = max_fury
         self.level = 1        
-        self.ability = TOWER_ABILITY_MAP[self.name]
+        self.ability = self._create_ability(name)
         self.fury_lock = fury_lock
         self.target_type = TargetType(target_type)
         #BASE STATS
@@ -60,7 +61,7 @@ class Tower(sprite.Sprite):
 
 
     #RENDER AND UPDATE
-    def update(self, delta_time):
+    def update(self, delta_time: float) -> None:
         if self.attack_cooldown > 0:
             self.attack_cooldown = max(0, self.attack_cooldown - delta_time)
 
@@ -69,7 +70,7 @@ class Tower(sprite.Sprite):
         self.attack_enemy(delta_time)
         if self.ability:
             self.ability.update(self, delta_time)
-    def render(self, screen):
+    def render(self, screen: Surface) -> None:
         # self.render_range(screen)
         if self.image:
             rect = self.image.get_rect(center=self.center_pos)
@@ -102,7 +103,7 @@ class Tower(sprite.Sprite):
                     (self.center_pos[0] - self.size/2, self.center_pos[1] - self.size/2, 
                      self.size, self.size), 
                     0, cooldown_pct * 6.28, 2)
-    def render_range(self, screen):
+    def render_range(self, screen: Surface) -> None:
         if self.name != "Sniper Cow":
             total_range = self.get_total_range()
             range_surface = Surface((total_range * 2, total_range * 2), SRCALPHA).convert_alpha()
@@ -128,23 +129,23 @@ class Tower(sprite.Sprite):
 
     #POSITION MECHANICS
     # @Logger.log_method()
-    def set_pos(self, pos):
+    def set_pos(self, pos: Tuple[int, int]) -> None:
         self.center_pos = pos
 
     # @Logger.log_method()
-    def set_position(self, tile:Tile):
+    def set_position(self, tile:Tile) -> None:
         self.center_pos = tuple(coord + TILE_SIZE / 2 for coord in tile.pos_top_left)
 
     # @Logger.log_method()
-    def set_position_bench(self, index):
+    def set_position_bench(self, index: int) -> None:
         row = index // 2
         col = index % 2
-        self.center_pos = (38 + (TILE_SIZE/2) + 84*col, 198 + (TILE_SIZE/2) + 84*row)
+        self.center_pos = (38 + (TILE_SIZE/2) + 84*col, 198 + (TILE_SIZE/2) + 140*row)
 
 
 
     #FINDING ENEMY, DEALING DAMAGE AND ROTATING
-    def find_closest_target(self):
+    def find_closest_target(self) -> None:
         enemies = enemies_on_map.sprites()
         if not enemies:
             self.target_enemy = None
@@ -166,12 +167,12 @@ class Tower(sprite.Sprite):
         elif self.target_type == TargetType.LOWEST_HEALTH_TARGET:
             self.target_enemy = min(in_range_enemies, key=lambda enemy: enemy.current_health)
 
-    def distance_to_enemy(self, enemy) -> float:
+    def distance_to_enemy(self, enemy: Enemy) -> float:
         dx = self.center_pos[0] - enemy.center_pos[0]
         dy = self.center_pos[1] - enemy.center_pos[1]
         return sqrt(dx**2 + dy**2)
 
-    def attack_enemy(self, delta_time):
+    def attack_enemy(self, delta_time) -> None:
         if self.target_enemy: 
             if  self.target_enemy.is_dead:
                 self.target_enemy = None
@@ -187,7 +188,7 @@ class Tower(sprite.Sprite):
                     self.attack_cooldown = 1 / self.get_total_attack_speed()
                     self.add_fury()
 
-    def rotate_to_target(self):
+    def rotate_to_target(self) -> None:
         if self.target_enemy:
             #Calculate angle to the target enemy
             dx = self.target_enemy.center_pos[0] - self.center_pos[0]
@@ -200,12 +201,12 @@ class Tower(sprite.Sprite):
 
     #EVENTS
     # @Logger.log_method()
-    def handle_left_click(self, mouse_pos):
+    def handle_left_click(self, mouse_pos: Tuple[int, int]):
         rect = self.image.get_rect(center=self.center_pos)
         if rect.collidepoint(mouse_pos):
             return self
     # @Logger.log_method()
-    def handle_right_click(self, mouse_pos):
+    def handle_right_click(self, mouse_pos: Tuple[int, int]):
         rect = self.image.get_rect(center=self.center_pos)
         if rect.collidepoint(mouse_pos):
             return self
@@ -214,7 +215,7 @@ class Tower(sprite.Sprite):
 
     #UTILITY FUNCTIONS
     @Logger.log_method()
-    def star_up(self):
+    def star_up(self) -> None:
         self.level += 1
 
         with open("assets/towers.yaml", 'r') as file:
@@ -234,7 +235,7 @@ class Tower(sprite.Sprite):
         self.base_fury_gain = level_attrs.get('fury_gain', self.base_fury_gain)
         self.ability.upgrade(self)
 
-    def add_fury(self):
+    def add_fury(self) -> None:
         if self.ability.active and self.fury_lock:
             return
         if self.current_fury + self.get_total_fury_gain() >= self.max_fury:
@@ -245,15 +246,28 @@ class Tower(sprite.Sprite):
         else:
             self.current_fury += self.get_total_fury_gain()
 
-
+    def _create_ability(self, tower_name: str) -> "TowerAbility":
+            ability_map = {
+                "Cow": lambda: RageAbility(),
+                "Air Cow": lambda: RageAbility(),
+                "Fire Cow": lambda: BlazeAbility(),
+                "Ice Cow": lambda: IceNovaAbility(),
+                "Sniper Cow": lambda: DeadeyeAbility(),
+            }
+            
+            ability_creator = ability_map.get(tower_name)
+            if ability_creator:
+                return ability_creator()
+            return None
+    
     #CLASS FUNCTIONS
-    def __str__(self):
+    def __str__(self) -> str:
         return super().__str__()
-    def __repr__(self):
+    def __repr__(self) -> str:
         return super().__repr__()
     
 class TowerAbility():
-    def __init__(self, fury_cost: int, name: str, duration: float = 0, has_duration: bool = False):
+    def __init__(self, fury_cost: int, name: str, duration: float = 0, has_duration: bool = False) -> None:
         self.name = name
         self.fury_cost = fury_cost
         self.active = False
@@ -267,13 +281,13 @@ class TowerAbility():
             return f"{base_info}\nDuration: {self.duration:.1f}s"
         return base_info
     
-    def activate(self):
+    def activate(self) -> None:
         pass
-    def deactivate(self):
+    def deactivate(self) -> None:
         pass        
-    def upgrade(self, level: int):
+    def upgrade(self, level: int) -> None:
         pass
-    def update(self, tower: Tower, delta_time: float):
+    def update(self, tower: Tower, delta_time: float) -> None:
         if self.active and self.has_duration:
             self.elapsed_time += delta_time
             if self.elapsed_time >= self.duration:
@@ -282,26 +296,28 @@ class TowerAbility():
                 self.elapsed_time = 0
         
 class RageAbility(TowerAbility): #Machinegun Cow
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(100, "Rage", 3, True)
         self.attack_speed_multiplier = 2
 
-    def activate(self, tower: Tower):
+    def activate(self, tower: Tower) -> None:
         tower.bonus_attack_speed += tower.base_attack_speed
         tower.bonus_range += 50;
         self.active = True
 
-    def deactivate(self, tower: Tower):
+    def deactivate(self, tower: Tower) -> None:
         tower.bonus_attack_speed -= tower.base_attack_speed
         tower.bonus_range -= 50;
+    def __str__(self) -> str:
+        return f"Doubles the tower attack speed for {self.duration} seconds."
 
 class BlazeAbility(TowerAbility): #Fire Cow
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(40, "Blaze")
         self.stacks = 0
         self.stack_dmg_amplifier = 0.5
 
-    def activate(self, tower: Tower):
+    def activate(self, tower: Tower) -> None:
         if self.stacks >= 25:
             burn_dmg = 10 + 0.1*tower.get_total_dmg()
             tower.appliable_effects.append(effects.BurnEffect(10, 5))
@@ -313,7 +329,7 @@ class BlazeAbility(TowerAbility): #Fire Cow
         tower.bonus_dmg += self.stack_dmg_amplifier
         self.active = True
     
-    def upgrade(self, tower: Tower):
+    def upgrade(self, tower: Tower) -> None:
         if tower.level == 2:
             tower.bonus_dmg -= self.stacks*self.stack_dmg_amplifier
             self.stack_dmg_amplifier *= 2
@@ -326,47 +342,54 @@ class BlazeAbility(TowerAbility): #Fire Cow
         return f"Stacks: {self.stacks}, bonus damage: {self.stacks*self.stack_dmg_amplifier}"
 
 class IceNovaAbility(TowerAbility): #Ice Cow
-    def __init__(self):
-        super().__init__(70, "Ice Nova", 3)
+    def __init__(self) -> None:
+        super().__init__(70, "Ice Nova", 3, True)
         self.range = 300
         # self.targets = []
-    def activate(self, tower: Tower):
+    def activate(self, tower: Tower) -> None:
         for enemy in enemies_on_map:
             if tower.distance_to_enemy(enemy) <= self.range:
                 # self.targets.append(enemy)
                 enemy.apply_effect(effects.SlowEffect(duration=self.duration, amount=90))
         self.active = True
-    def deactivate(self, tower: Tower):
+    def deactivate(self, tower: Tower) -> None:
         pass
+    def upgrade(self, tower: Tower) -> None:
+        if tower.level == 2:
+            self.range = 330
+            self.duration = 4
+        if tower.level == 3:
+            self.range = 330
+            self.duration = 5
     def __str__(self) -> str:
         return f"Stuns all the slimes in {self.range} range for {self.duration} seconds"
 
 class DeadeyeAbility(TowerAbility):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(100, "Deadeye", 5, True)
         self.bonus_dmg = 1000
-    def activate(self, tower: Tower):
+    def activate(self, tower: Tower) -> None:
         self.active = True
         tower.bonus_dmg += self.bonus_dmg
-    def deactivate(self, tower: Tower):
+    def deactivate(self, tower: Tower) -> None:
         tower.bonus_dmg -= self.bonus_dmg
+    def upgrade(self, tower: Tower) -> None:
+        if tower.level == 2:
+            self.range = 330
+            self.duration = 5.5
+        if tower.level == 3:
+            self.range = 330
+            self.duration = 6.5
+    def __str__(self) -> str:
+        return f"Oneshots enemies for {self.duration} seconds"
 
 class ArtileryBombingAbility(TowerAbility):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(120, "Artilery Bombing")
         self.range = 400
         self.damage = 80
-    def activate(self, tower: Tower):
+    def activate(self, tower: Tower) -> None:
         self.active = True
         for enemy in enemies_on_map:
             if tower.distance_to_enemy(enemy) <= self.range:
                 enemy.take_damage(self.damage)
-
-        
-
-TOWER_ABILITY_MAP = {
-    "Cow": RageAbility(),
-    "Fire Cow": BlazeAbility(),
-    "Ice Cow": IceNovaAbility(),
-    "Sniper Cow": DeadeyeAbility(),
-}

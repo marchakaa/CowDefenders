@@ -1,68 +1,34 @@
 # CowDefenders - Tower Defense Game
-
-**CowDefenders** is a strategic tower defense game made in pygame where **cows** battle against waves of **slimes**! Inspired by traditional tower defense mechanics and games like **Teamfight Tactics (TFT)**, players must strategically buy, combine, and place different cows to defend their farm from relentless slime invaders.
-
-## Features
-
-- **Cows vs. Slimes**: Defend your farm by assembling a powerful army of cows. Use their unique abilities to hold off waves of dangerous slimes.
-- **TFT-Inspired Mechanics**: Just like in TFT, the game features a **shop** where players can buy cows (cards), refresh the shop, and combine cows of the same type to create stronger units.
-- **Combining Cows**: Purchase three of the same cow, and you can **combine** them to create a more powerful version of that cow with enhanced abilities.
-- **Multiple Waves**: Defend your farm through multiple waves of slimes, each becoming increasingly difficult. Survive until the last wave, or fight until your cows are overrun!
-- **Dynamic Strategy**: Adjust your strategy between waves by buying new cows, upgrading existing ones, and positioning your cows on the map to counter the incoming slimes.
-
-## How to Play
-
-1. **Start the Game**: You will begin with a limited amount of resources to buy cows from the **shop**.
-2. **Buy Cows**: Each round, you'll have a set of random cows available for purchase. Use your resources wisely to buy cows and refresh the shop if necessary.
-3. **Combine Cows**: Acquire three of the same cow to automatically combine them into a stronger unit.
-4. **Position Your Cows**: After purchasing cows, drag and position them strategically on the battlefield to defend against the waves of slimes.
-5. **Defend**: Slimes will attack in waves. Each cow you place will fight the slimes using their unique abilities. If you successfully defeat a wave, you can move on to the next.
-6. **Repeat**: After each wave, you'll return to the shop to buy new cows, combine them, and prepare for the next attack.
-7. **Victory or Defeat**: Survive until the final wave to win the game. If the slimes reach your farm's defenses and overwhelm you, the game is lost!
-
-## Game Mechanics
-
-- **Shop**: You can spend resources to buy new cows from the shop. The shop refreshes each round, or you can pay to refresh it manually.
-- **Combining Cows**: When you purchase three identical cows, they automatically combine into a stronger version with better stats and abilities.
-- **Upgrade Shop**: As you progress, you can upgrade the shop to offer more powerful and rare cows.
-- **Wave System**: Each wave of slimes grows stronger. You’ll need to improve your cow army and strategy to deal with each new challenge.
-
-## Cow Types
-
-- **Moochine Gunner**: A rapid-fire cow with machine gun-like milk blasts. High attack speed but lower individual damage, great for taking down waves of small, fast-moving slimes.
-  
-- **Cowtapult**: A long-range cow that hurls large clumps of dirt at enemies, dealing area-of-effect (AoE) damage. Slower attack speed but deals heavy damage in a wide area.
-
-- **Milker**: A support cow that heals other nearby cows over time. Great for keeping your defenses strong during long waves.
-
-- **Steak Shield**: A defensive cow that creates a shield for itself and nearby cows, temporarily reducing incoming damage. Ideal for holding off waves of tough enemies.
-
-- **Frost Cow**: Slows down enemies with each attack, covering them in a layer of frost that reduces their movement speed, allowing your other cows to finish them off more easily.
-
-
-Combine cows to unlock even stronger versions with upgraded abilities!
-
-## Installation & Setup
-
+**CowDefenders** is a strategic tower defense game made with pygame where **cows** battle against waves of **slimes**! Inspired by traditional tower defense mechanics and games like **Teamfight Tactics (TFT)**, players must strategically buy, combine, and place different cows to defend their farm from relentless slime invaders.
+## Instalation & Setup
 1. Clone the repository:
    ```bash
    git clone https://github.com/marchakaa/CowDefenders
-2. Install the necessary dependencies (ensure you have Python and Pygame installed):
+2. Install requirements.txt:
    ```bash
-   pip install pygame
+   pip install -r requirements.txt
 3. Run the game
    ```bash
    python main.py
-
-## Controls
-- **TBD**
-
-## Future Features
-- **More Cows**
-- **Abilities**
-
-## Credits
-- **Game Design:** marchakaa
-- **Programming:** marchakaa
-- **Art & Graphics:** marchakaa
-- **Sound Effects:** TBD
+## Game Mechanics
+- **Cows**: Buy cows to defend from the slimes (keep in mind what you buy and place on the field, you can't sell or bench towers). Cows are separated in 5 tiers.
+- **Upgrade**: Buying three times the same tower will upgrade the tower to level 2, combining 3 level 2 towers will make the tower level 3. Each level increases the strength of the tower.
+- **Shop**: After each wave you are rewarded with gold. With gold you can buy towers from the shop or refresh the shop. The shop contains 5 random towers and as the game progresses you higher tier cows will appear in the shop.
+- **Waves**: Each wave of slimes grow stronger. So you need to make sure you have strong enough towers to defend them!
+- **Enemies**: Slimes have different strengths (some are with more hp, some are faster).
+## How to Play
+1. **Start the Game**: I mentioned above how to start the game.
+2. **Main menu**: Main menu has 3 options: ("Start Game", "Continue Game", "Exit Game"). They are self explaining.
+3. **Continue menu**: In this menu you can find your saved games and continue them or delete them.
+3. **Game Start**: When the game begins prepare yourself and when you are ready start the waves by clicking SPACE.
+## Cow Types
+- **Moochine Gunner**: 1 cost. Shoots very fast. Rage Ability doubles the Moochine Gunner's attack speed.
+- **Ice Cow**: 3 cost. Shoots fast and doesn't deal a lot of damage. IceNova Ability slows the enemies within 300 units. 
+- **Sniper Cow**: 4 cost. Deals lots of damage, but shoots slow. Deadeye ability allows this tower to oneshot the 2 strongest enemies on the board.
+- **Fire Cow**: 5 cost. This tower scales with the Blaze Ability. Each cast gives this tower attack damage reaching milestones gives it Burn effect on attacks and increases it's range.
+## Upcomming Features
+- **NEW Cows**: New Cows will be added into the game.
+- **Traits**: Traits will be powerful buffs that requare combinations of cows.
+- **NEW Enemies**: Enemies are quite simple for now, but they will have abilities in the future.
+- **NEW Maps**: The players will be able to defend different fields.
+- **Effects**: For now the game can't be playable with effects (audio and visual), but they will be added in the future.

@@ -5,6 +5,7 @@ import os
 from src.settings import RARITY_COLORS, FONT_URL
 from src.logger import Logger
 from copy import deepcopy
+from typing import Tuple, Dict
 
 class Rarity(Enum):
     EMPTY = 0
@@ -18,7 +19,7 @@ class Card:
     _font = None
     
     def __init__(self, cow_name: str, rarity: Rarity, damage: float, attack_speed: float, attack_range: int, starting_fury: int, \
-                 max_fury: int, fury_gain: int, fury_lock: bool, target_type: str, traits=None, image_size=(222, 150)):
+                 max_fury: int, fury_gain: int, fury_lock: bool, target_type: str, traits=None, image_size=(222, 150)) -> None:
         self.cow_name = cow_name
         self.damage = damage
         self.traits = traits
@@ -54,7 +55,7 @@ class Card:
         # Pre-render text
         self.text_surface = Card._font.render(self.cow_name, True, (255, 255, 255))
 
-    def render(self, screen, pos):
+    def render(self, screen: pygame.Surface, pos: Tuple[int, int]) -> None:
         self.button_rect = pygame.Rect(pos[0], pos[1], self.image_size[0], self.image_size[1] + 61 + 2)
         
         mouse_pos = pygame.mouse.get_pos()
@@ -80,16 +81,16 @@ class Card:
         screen.blit(self.text_surface, text_rect)
         
     # @Logger.log_method()
-    def is_clicked(self, mouse_pos):
+    def is_clicked(self, mouse_pos: Tuple[int, int]) -> bool:
         return self.button_rect and self.button_rect.collidepoint(mouse_pos)
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Card(cow_name='{self.cow_name}', rarity={self.rarity.name}, traits={self.traits})"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.rarity.name} Card: {self.cow_name}"
 
-    def clone(self):
+    def clone(self) -> "Card":
         new_card = Card(
             cow_name=self.cow_name,
             rarity=self.rarity,
@@ -106,7 +107,7 @@ class Card:
         )
         return new_card
     
-def load_cards_from_yaml(file_path):
+def load_cards_from_yaml(file_path: str) -> Dict[str, Card]:
     with open(file_path, 'r') as file:
         data = yaml.safe_load(file)
     cards = {}
